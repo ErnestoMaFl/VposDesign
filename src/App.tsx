@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Droplet } from 'lucide-react'; // <-- Importación necesaria para el ícono del 3er ítem
 import { VoiceOrb, type VoiceOrbState } from "./components/shared/VoiceOrb";
 import { ProcessStepBar } from "./components/shared/ProcessStepBar";
+import { CartLineItem } from "./components/shared/CartLineItem";
 
 export default function App() {
   const [orbState, setOrbState] = useState<VoiceOrbState>('standby');
@@ -10,7 +12,7 @@ export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const saleSteps = ['Agregar', 'Descuento', 'Cobrar', 'Confirmar'];
 
-  // Renderizador de Ghost Buttons (manteniendo la pureza del diseño)
+  // Renderizador de Ghost Buttons
   const renderButton = (
     isActive: boolean, 
     onClick: () => void, 
@@ -19,7 +21,7 @@ export default function App() {
     <button
       onClick={onClick}
       className={`
-        px-4 py-2 rounded text-sm transition-all duration-200
+        px-3 py-1.5 rounded text-xs transition-all duration-200
         ${isActive 
           ? 'bg-surface-high text-on-surface' 
           : 'bg-transparent text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
@@ -40,62 +42,99 @@ export default function App() {
         contextMessage={stepMode === 'context' ? 'Selecciona una operación para comenzar' : undefined}
       />
 
-      {/* Contenedor central (Main Workspace) */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-16">
+      {/* Grid Principal: Carrito (Izquierda) + Panel de Voz (Derecha) */}
+      <div className="flex-1 flex w-full">
         
-        {/* Título - Tensión Editorial */}
-        <div className="text-center space-y-2">
-          <h1 className="font-narrative text-4xl tracking-wide">The Monolith</h1>
-          <p className="font-utility text-on-surface-variant font-medium text-sm">
-            Component Isolation Environment
-          </p>
-        </div>
-
-        {/* El Orb en aislamiento */}
-        <div className="p-8 bg-surface-low rounded-2xl">
-          <VoiceOrb status={orbState} size="lg" />
-        </div>
-
-        {/* Controles de Mocking Visual */}
-        <div className="flex flex-col gap-4 w-full max-w-2xl px-4">
+        {/* LADO IZQUIERDO: MAIN CONTENT (El Carrito) */}
+        <div className="flex-1 flex flex-col pt-8 border-r border-surface-low">
+          <h2 className="font-utility text-xs text-on-surface-variant tracking-widest uppercase mb-4 px-10">
+            Carrito Actual
+          </h2>
           
-          {/* Controles del Voice Orb */}
-          <div className="flex flex-col gap-2 p-4 bg-surface-recessed rounded-xl">
-            <span className="text-xs text-on-surface-variant font-medium tracking-widest uppercase mb-1">Estado del Micrófono</span>
-            <div className="flex flex-wrap gap-2">
-              {renderButton(orbState === 'standby', () => setOrbState('standby'), 'Standby')}
-              {renderButton(orbState === 'listening', () => setOrbState('listening'), 'Listening')}
-              {renderButton(orbState === 'processing', () => setOrbState('processing'), 'Processing')}
-              {renderButton(orbState === 'success', () => setOrbState('success'), 'Success')}
-              {renderButton(orbState === 'ambiguity', () => setOrbState('ambiguity'), 'Ambiguity')}
-              {renderButton(orbState === 'error', () => setOrbState('error'), 'Error')}
-            </div>
+          {/* Lista de productos sin bordes, puro "Tonal Layering" */}
+          {/* Lista de productos sin bordes, puro "Tonal Layering" */}
+          <div className="flex flex-col gap-2 px-4">
+            <CartLineItem 
+              index={1} 
+              name="Coca-Cola Original 600ml" 
+              description="Envase PET, Fría"
+              quantity={2} 
+              unitPrice={18.50} 
+              subtotal={37.00} 
+              origin="voice"
+            />
+            <CartLineItem 
+              index={2} 
+              name="Sabritas Sal 45g" 
+              description="Pasillo 3"
+              quantity={1} 
+              unitPrice={20.00} 
+              subtotal={20.00} 
+              origin="touch"
+            />
+            <CartLineItem 
+              index={3}
+              name="Coca Cola Regular" 
+              description="Lata 355ml"
+              quantity={3} 
+              unitPrice={3.50} 
+              subtotal={10.50} 
+              origin="voice"
+              isActive={true} 
+              icon={<Droplet size={18} className="text-accent-plum" />}
+            />
           </div>
-
-          {/* Controles de la ProcessStepBar */}
-          <div className="flex flex-col gap-2 p-4 bg-surface-recessed rounded-xl">
-            <span className="text-xs text-on-surface-variant font-medium tracking-widest uppercase mb-1">Control de Flujo (Pila)</span>
-            
-            <div className="flex flex-wrap gap-2 mb-2 pb-2 border-b-2 border-surface-base">
-              {renderButton(stepMode === 'context', () => setStepMode('context'), 'Forzar Modo Libre')}
-              {renderButton(stepMode === 'linear', () => setStepMode('linear'), 'Forzar Flujo de Venta')}
-            </div>
-
-            {stepMode === 'linear' && (
-              <div className="flex flex-wrap gap-2">
-                {saleSteps.map((step, idx) => 
-                  renderButton(
-                    currentStep === idx, 
-                    () => setCurrentStep(idx), 
-                    `Paso: ${step}`
-                  )
-                )}
-              </div>
-            )}
-          </div>
-
         </div>
+
+        {/* LADO DERECHO: VOICE PANEL */}
+        <div className="w-[380px] bg-surface-low flex flex-col items-center pt-20 gap-12 px-8">
+          <VoiceOrb status={orbState} size="lg" />
+          
+          <div className="text-center space-y-2 w-full">
+            <p className="font-utility text-xs text-on-surface-variant font-medium tracking-widest uppercase">
+              Lo que escuché
+            </p>
+            <p className="font-narrative text-2xl text-on-surface italic opacity-80 leading-tight">
+              "agrega tres maruchan de habanero"
+            </p>
+          </div>
+        </div>
+
       </div>
+
+      {/* Controles de Mocking Visual (Flotantes en la parte inferior para no ensuciar el diseño) */}
+      <div className="fixed bottom-0 left-0 w-full p-4 bg-surface-recessed border-t border-surface-bright-edge/30 flex justify-between items-center z-50">
+        
+        {/* Controles del Orb */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Micrófono:</span>
+          {renderButton(orbState === 'standby', () => setOrbState('standby'), 'Standby')}
+          {renderButton(orbState === 'listening', () => setOrbState('listening'), 'Listening')}
+          {renderButton(orbState === 'processing', () => setOrbState('processing'), 'Processing')}
+          {renderButton(orbState === 'success', () => setOrbState('success'), 'Success')}
+          {renderButton(orbState === 'ambiguity', () => setOrbState('ambiguity'), 'Ambiguity')}
+          {renderButton(orbState === 'error', () => setOrbState('error'), 'Error')}
+        </div>
+
+        {/* Controles del Flujo */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Flujo:</span>
+          {renderButton(stepMode === 'context', () => setStepMode('context'), 'Modo Libre')}
+          <div className="w-[1px] h-4 bg-surface-bright-edge mx-1"></div>
+          {saleSteps.map((step, idx) => 
+            renderButton(
+              stepMode === 'linear' && currentStep === idx, 
+              () => {
+                setStepMode('linear');
+                setCurrentStep(idx);
+              }, 
+              step
+            )
+          )}
+        </div>
+
+      </div>
+
     </div>
   );
 }
