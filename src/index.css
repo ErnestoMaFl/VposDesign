@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+@theme {
+  /* Surface Tiers */
+  --color-surface-recessed: #0B0D10;
+  --color-surface-base: #0F1013;
+  --color-surface-low: #181A1F;
+  --color-surface-container: #1F2128;
+  --color-surface-high: #272B34;
+  --color-surface-highest: #31353F;
+  --color-surface-bright-edge: #3C4150;
+  
+  /* Accent Triad */
+  --color-accent-sage: #4D7A63;
+  --color-accent-navy: #3F5A7A;
+  --color-accent-plum: #5C4275;
+
+  /* Text */
+  --color-on-surface: #e3e2e6;
+  --color-on-surface-variant: #9ca3af;
+
+  /* Typography */
+  --font-utility: "Inter", sans-serif;
+  --font-narrative: "DM Serif Display", serif;
+}
+
+/* Base Monolith Layer */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-surface-base);
+  color: var(--color-on-surface);
+  font-family: var(--font-utility);
+  /* The "No-Line" Rule Base: Evitamos scrollbars feas que rompan la inmersión */
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
