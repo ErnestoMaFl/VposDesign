@@ -29,7 +29,7 @@ export const DisambiguationPanel: React.FC<DisambiguationPanelProps> = ({
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="absolute inset-0 z-40 flex flex-col pt-12 px-8 bg-surface-highest/60 backdrop-blur-md rounded-tr-xl">
+    <div className="absolute inset-0 z-40 flex flex-col pt-12 px-8 bg-surface-highest/60 backdrop-blur-md">
       
       {/* Animación personalizada para la presión de tiempo */}
       <style>{`
@@ -75,7 +75,7 @@ export const DisambiguationPanel: React.FC<DisambiguationPanelProps> = ({
         ))}
       </div>
 
-      {/* Opción para cancelar con hover rojo transparente */}
+      {/* Opción para cancelar */}
       <div className="mt-8 flex justify-center">
         <button 
           onClick={onCancel}
