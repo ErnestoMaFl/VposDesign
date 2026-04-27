@@ -4,7 +4,6 @@ import { type VoiceOrbState } from "./components/shared/VoiceOrb";
 import { ProcessStepBar } from "./components/shared/ProcessStepBar";
 import { DisambiguationPanel } from "./components/shared/DisambiguationPanel";
 import { type ConnectionState } from "./components/shared/HeaderBar";
-import { type InterpretationItem } from "./components/shared/VoicePanel";
 import { CartPanel, type CartStatus, type CartItemType } from "./components/shared/CartPanel";
 import { AppShell } from "./components/shared/AppShell";
 import { AuthShell } from "./components/shared/AuthShell"; // NUEVO
@@ -108,7 +107,7 @@ export default function App() {
         {showAmbiguity && (
           <DisambiguationPanel 
             options={mockAmbiguousOptions}
-            onSelect={(id) => { setShowAmbiguity(false); setOrbState('success'); }}
+            onSelect={() => { setShowAmbiguity(false); setOrbState('success'); }}
             onCancel={() => { setShowAmbiguity(false); setOrbState('standby'); }}
           />
         )}
