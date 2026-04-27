@@ -6,7 +6,9 @@ import { DisambiguationPanel } from "./components/shared/DisambiguationPanel";
 import { type ConnectionState } from "./components/shared/HeaderBar";
 import { type InterpretationItem } from "./components/shared/VoicePanel";
 import { CartPanel, type CartStatus, type CartItemType } from "./components/shared/CartPanel";
-import { AppShell } from "./components/shared/AppShell"; // NUEVO IMPORTE MAESTRO
+import { AppShell } from "./components/shared/AppShell";
+import { AuthShell } from "./components/shared/AuthShell"; // NUEVO
+import { LoginScreen } from "./components/shared/LoginScreen"; // NUEVO
 
 const mockAmbiguousOptions = [
   { id: '1', name: 'Coca-Cola Original 600ml', category: 'Bebidas - PET', price: 18.50, stock: 24, confidence: 92 },
@@ -19,9 +21,11 @@ const mockCartItems: CartItemType[] = [
   { id: 'i2', name: 'Sabritas Sal 45g', description: 'Pasillo 3', quantity: 1, unitPrice: 20.00, subtotal: 20.00, origin: 'touch' },
   { id: 'i3', name: 'Coca Cola Regular', description: 'Lata 355ml', quantity: 3, unitPrice: 3.50, subtotal: 10.50, origin: 'voice', isActive: true, icon: <Droplet size={18} className="text-accent-plum" /> },
 ];
-
 export default function App() {
-  // ESTADOS DEL SISTEMA
+  //Estado de Vista Principal (Enrutador manual para el MVP)
+  const [currentView, setCurrentView] = useState<'login' | 'app'>('login');
+
+  // Estados del sistema
   const [orbState, setOrbState] = useState<VoiceOrbState>('standby');
   const [stepMode, setStepMode] = useState<'linear' | 'context'>('linear');
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,9 +44,31 @@ export default function App() {
     </button>
   );
 
+  // RENDERIZADO CONDICIONAL DE RUTAS
+  if (currentView === 'login') {
+    return (
+      <>
+        <AuthShell>
+          <LoginScreen onLoginSuccess={() => setCurrentView('app')} />
+        </AuthShell>
+        
+        {/* MOCK CONTROL PARA SALTAR EL LOGIN RÁPIDO */}
+        <div className="fixed bottom-4 right-4 z-50">
+          <button 
+            onClick={() => setCurrentView('app')}
+            className="px-4 py-2 bg-surface-container border border-surface-bright-edge text-on-surface-variant text-xs rounded shadow-lg hover:text-on-surface"
+          >
+            Saltar Login (Mock)
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // VISTA PRINCIPAL (Tu código anterior)
   return (
     <>
-      {/* EL CASCARÓN MAESTRO */}
+    {/* EL CASCARÓN MAESTRO */}
       <AppShell
         headerProps={{
           connectionStatus: connectionState,
@@ -130,6 +156,15 @@ export default function App() {
           {renderButton(connectionState === 'offline', () => setConnectionState('offline'), 'OFF')}
         </div>
 
+      </div>
+      {/* Agregamos un botón para volver al login y probar el flujo */}
+      <div className="fixed bottom-20 left-4 z-50">
+          <button 
+            onClick={() => setCurrentView('login')}
+            className="px-4 py-2 bg-surface-container border border-[#9B4444]/30 text-[#9B4444] text-xs rounded-full shadow-lg hover:bg-[#9B4444]/20"
+          >
+            &larr; Volver al Login
+          </button>
       </div>
     </>
   );
