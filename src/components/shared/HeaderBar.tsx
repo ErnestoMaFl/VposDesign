@@ -15,7 +15,7 @@ interface HeaderBarProps {
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   moduleName = "Venta Activa",
   breadcrumb = "VPOS",
-  cashierName = "Ana López",
+  cashierName = "Ernesto Macias",
   role = "Cajera",
   shift = "Turno Matutino",
   connectionStatus = 'online'

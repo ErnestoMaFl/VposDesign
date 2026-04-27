@@ -6,6 +6,7 @@ import { CartLineItem } from "./components/shared/CartLineItem";
 import { DisambiguationPanel } from "./components/shared/DisambiguationPanel";
 import { CartSummaryFooter } from "./components/shared/CartSummaryFooter";
 import { HeaderBar, type ConnectionState } from "./components/shared/HeaderBar";
+import { VoicePanel, type InterpretationItem } from "./components/shared/VoicePanel";
 
 const mockAmbiguousOptions = [
   { id: '1', name: 'Coca-Cola Original 600ml', category: 'Bebidas - PET', price: 18.50, stock: 24, confidence: 92 },
@@ -36,6 +37,30 @@ export default function App() {
       {label}
     </button>
   );
+
+  // Datos simulados reactivos para el VoicePanel
+  const currentTranscript = showAmbiguity 
+    ? "agrega una coca" 
+    : "agrega tres maruchan de habanero";
+    
+  const currentIntention = showAmbiguity 
+    ? "BÚSQUEDA_AMBIGUA" 
+    : "TRANSACCIÓN_VENTA";
+    
+  const currentInterpretations: InterpretationItem[] = showAmbiguity
+    ? [
+        { id: '1', text: 'Detectada intención: Agregar', status: 'success', semanticType: 'add' },
+        { id: '2', text: 'Entidad: "coca" (Múltiples coincidencias)', status: 'error' }
+      ]
+    : [
+        { id: '1', text: 'Intención: Agregar', status: 'success', semanticType: 'add' },
+        { id: '2', text: 'Cantidad: 3', status: 'success', semanticType: 'quantity' },
+        { id: '3', text: 'Producto: Sopa Maruchan Habanero', status: 'pending', semanticType: 'product' }
+      ];
+
+  const currentCommands = showAmbiguity
+    ? ['Opción 1', 'Opción 2', 'La de 600 mililitros', 'Ninguna']
+    : ['Cobrar venta', 'Aplicar descuento', 'Cancelar', 'Buscar producto'];
 
   return (
     <div className="flex w-full h-screen bg-surface-base text-on-surface overflow-hidden">
@@ -74,11 +99,14 @@ export default function App() {
                 quantity={1} unitPrice={20.00} subtotal={20.00} origin="touch"
               />
               <CartLineItem 
-                index={3} name="Coca Cola Regular" description="Lata 355ml"
+                index={3} name="Gansitos" description="Marinela"
+                quantity={1} unitPrice={18.00} subtotal={18.00} origin="touch"
+              />
+              <CartLineItem 
+                index={4} name="Coca Cola Regular" description="Lata 355ml"
                 quantity={3} unitPrice={3.50} subtotal={10.50} origin="voice" isActive={true} 
                 icon={<Droplet size={18} className="text-accent-plum" />}
               />
-              {/* Duplica los ítems varias veces aquí si quieres probar el scroll y ver cómo se desvanecen */}
             </div>
 
             {/* MÁSCARA PREMIUM: Gradiente que desvanece los ítems hacia el color surface-base */}
@@ -104,20 +132,15 @@ export default function App() {
       </div>
 
       {/* LADO DERECHO: PILAR DE VOZ */}
-      <div className="w-[380px] h-full bg-surface-low shadow-[-20px_0_50px_rgba(0,0,0,0.3)] z-30 flex flex-col items-center pt-32 gap-16 px-8 pb-[calc(2rem+72px)] relative">
-        
-        <VoiceOrb status={orbState} size="lg" />
-        
-        <div className="text-center space-y-3 w-full">
-          <p className="font-utility text-xs text-on-surface-variant font-medium tracking-widest uppercase">
-            Lo que escuché
-          </p>
-          <p className="font-narrative text-3xl text-on-surface italic opacity-90 leading-tight">
-            {showAmbiguity ? '"agrega una coca"' : '"agrega tres maruchan de habanero"'}
-          </p>
-        </div>
-
-      </div>
+      <VoicePanel 
+        status={orbState}
+        transcriptText={currentTranscript}
+        isPartialTranscript={orbState === 'listening'}
+        detectedIntention={currentIntention}
+        interpretations={currentInterpretations}
+        availableCommands={currentCommands}
+        // aiStats usa los valores por defecto que le pusimos, pero puedes pasarlos aquí
+      />
 
       {/* Controles de Mocking Visual */}
       <div className="fixed bottom-0 left-0 w-full p-4 bg-surface-recessed border-t border-surface-bright-edge/30 flex justify-between items-center z-50">
