@@ -5,6 +5,7 @@ import { ProcessStepBar } from "./components/shared/ProcessStepBar";
 import { CartLineItem } from "./components/shared/CartLineItem";
 import { DisambiguationPanel } from "./components/shared/DisambiguationPanel";
 import { CartSummaryFooter } from "./components/shared/CartSummaryFooter";
+import { HeaderBar, type ConnectionState } from "./components/shared/HeaderBar";
 
 const mockAmbiguousOptions = [
   { id: '1', name: 'Coca-Cola Original 600ml', category: 'Bebidas - PET', price: 18.50, stock: 24, confidence: 92 },
@@ -17,6 +18,7 @@ export default function App() {
   const [stepMode, setStepMode] = useState<'linear' | 'context'>('linear');
   const [currentStep, setCurrentStep] = useState(0);
   const [showAmbiguity, setShowAmbiguity] = useState(false);
+  const [connectionState, setConnectionState] = useState<ConnectionState>('online');
 
   const saleSteps = ['Agregar', 'Descuento', 'Cobrar', 'Confirmar'];
 
@@ -40,6 +42,8 @@ export default function App() {
       
       {/* LADO IZQUIERDO: ÁREA PRINCIPAL */}
       <div className="flex-1 flex flex-col relative">
+
+        <HeaderBar connectionStatus={connectionState} />
         
         <ProcessStepBar 
           steps={saleSteps} 
@@ -143,6 +147,13 @@ export default function App() {
             () => { setShowAmbiguity(!showAmbiguity); if (!showAmbiguity) setOrbState('ambiguity'); }, 
             'Panel Ambigüedad'
           )}
+
+          {/* CONTROLES DE RED PARA MOCKING */}
+          <div className="w-[1px] h-4 bg-surface-bright-edge mx-2"></div>
+          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Red:</span>
+          {renderButton(connectionState === 'online', () => setConnectionState('online'), 'Online')}
+          {renderButton(connectionState === 'local', () => setConnectionState('local'), 'Local')}
+          {renderButton(connectionState === 'offline', () => setConnectionState('offline'), 'Offline')}
         </div>
       </div>
     </div>
