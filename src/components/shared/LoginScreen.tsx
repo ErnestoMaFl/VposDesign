@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, ShieldCheck, Delete, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Delete, ArrowLeft } from 'lucide-react';
 import { ProcessStepBar } from './ProcessStepBar';
 
 const mockCashiers = [
