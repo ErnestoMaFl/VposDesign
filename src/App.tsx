@@ -6,8 +6,10 @@ import { DisambiguationPanel } from "./components/shared/DisambiguationPanel";
 import { type ConnectionState } from "./components/shared/HeaderBar";
 import { CartPanel, type CartStatus, type CartItemType } from "./components/shared/CartPanel";
 import { AppShell } from "./components/shared/AppShell";
-import { AuthShell } from "./components/shared/AuthShell"; // NUEVO
-import { LoginScreen } from "./components/shared/LoginScreen"; // NUEVO
+import { AuthShell } from "./components/shared/AuthShell";
+import { LoginScreen } from "./components/shared/LoginScreen";
+import { PaymentPanel } from "./components/shared/PaymentPanel";
+import { SystemSidebar } from "./components/shared/SystemSidebar"; 
 
 const mockAmbiguousOptions = [
   { id: '1', name: 'Coca-Cola Original 600ml', category: 'Bebidas - PET', price: 18.50, stock: 24, confidence: 92 },
@@ -20,11 +22,9 @@ const mockCartItems: CartItemType[] = [
   { id: 'i2', name: 'Sabritas Sal 45g', description: 'Pasillo 3', quantity: 1, unitPrice: 20.00, subtotal: 20.00, origin: 'touch' },
   { id: 'i3', name: 'Coca Cola Regular', description: 'Lata 355ml', quantity: 3, unitPrice: 3.50, subtotal: 10.50, origin: 'voice', isActive: true, icon: <Droplet size={18} className="text-accent-plum" /> },
 ];
-export default function App() {
-  //Estado de Vista Principal (Enrutador manual para el MVP)
-  const [currentView, setCurrentView] = useState<'login' | 'app'>('login');
 
-  // Estados del sistema
+export default function App() {
+  const [currentView, setCurrentView] = useState<'login' | 'app'>('login');
   const [orbState, setOrbState] = useState<VoiceOrbState>('standby');
   const [stepMode, setStepMode] = useState<'linear' | 'context'>('linear');
   const [currentStep, setCurrentStep] = useState(0);
@@ -34,24 +34,12 @@ export default function App() {
 
   const saleSteps = ['Agregar', 'Descuento', 'Cobrar', 'Confirmar'];
 
-  const renderButton = (isActive: boolean, onClick: () => void, label: string) => (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1.5 rounded text-xs transition-all duration-200 ${isActive ? 'bg-surface-high text-on-surface' : 'bg-transparent text-on-surface-variant hover:bg-surface-container hover:text-on-surface'}`}
-    >
-      {label}
-    </button>
-  );
-
-  // RENDERIZADO CONDICIONAL DE RUTAS
   if (currentView === 'login') {
     return (
-      <>
+      <div className="flex w-full h-screen bg-surface-base overflow-hidden">
         <AuthShell>
           <LoginScreen onLoginSuccess={() => setCurrentView('app')} />
         </AuthShell>
-        
-        {/* MOCK CONTROL PARA SALTAR EL LOGIN RÁPIDO */}
         <div className="fixed bottom-4 right-4 z-50">
           <button 
             onClick={() => setCurrentView('app')}
@@ -60,111 +48,85 @@ export default function App() {
             Saltar Login (Mock)
           </button>
         </div>
-      </>
+      </div>
     );
   }
 
-  // VISTA PRINCIPAL (Tu código anterior)
   return (
-    <>
-    {/* EL CASCARÓN MAESTRO */}
-      <AppShell
-        headerProps={{
-          connectionStatus: connectionState,
-          moduleName: "Venta Principal",
-        }}
-        voiceProps={{
-          status: orbState,
-          transcriptText: showAmbiguity ? "agrega una coca" : "agrega tres maruchan de habanero",
-          isPartialTranscript: orbState === 'listening',
-          detectedIntention: showAmbiguity ? "BÚSQUEDA_AMBIGUA" : "TRANSACCIÓN_VENTA",
-          interpretations: showAmbiguity 
-            ? [{ id: '1', text: 'Detectada intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Entidad: "coca" (Múltiples coincidencias)', status: 'error' }] 
-            : [{ id: '1', text: 'Intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Cantidad: 3', status: 'success', semanticType: 'quantity' }, { id: '3', text: 'Producto: Sopa Maruchan Habanero', status: 'pending', semanticType: 'product' }],
-          availableCommands: showAmbiguity 
-            ? ['Opción 1', 'Opción 2', 'La de 600 mililitros', 'Ninguna'] 
-            : ['Cobrar venta', 'Aplicar descuento', 'Cancelar', 'Buscar producto'],
-        }}
-      >
-        {/* === CONTENIDO DINÁMICO DE LA PANTALLA DE VENTA === */}
-        <ProcessStepBar 
-          steps={saleSteps} 
-          currentStep={currentStep} 
-          contextMessage={stepMode === 'context' ? 'Selecciona una operación para comenzar' : undefined}
-        />
+    // FIX MAESTRO: Envolvemos TODO en un contenedor Flex Horizontal general
+    <div className="flex w-full h-screen bg-surface-base overflow-hidden">
+      
+      {/* 1. SIDEBAR EMPUJADOR */}
+      <SystemSidebar 
+        connectionState={connectionState} setConnectionState={setConnectionState}
+        cartStatus={cartStatus} setCartStatus={setCartStatus}
+        orbState={orbState} setOrbState={setOrbState}
+        stepMode={stepMode} setStepMode={setStepMode}
+        showAmbiguity={showAmbiguity} setShowAmbiguity={setShowAmbiguity}
+        onAdvanceStep={() => { setStepMode('linear'); setCurrentStep((prev) => (prev + 1) % saleSteps.length); }}
+        onGoToLogin={() => setCurrentView('login')}
+      />
 
-        <CartPanel 
-          status={cartStatus}
-          items={cartStatus === 'empty' ? [] : mockCartItems}
-          totals={{ subtotal: 67.50, discount: 10.50, iva: 9.12, total: 66.12 }}
-          onIncreaseItem={(id) => console.log('Aumentar', id)}
-          onDecreaseItem={(id) => console.log('Reducir', id)}
-          onDeleteItem={(id) => console.log('Eliminar', id)}
-          onCharge={() => console.log('Cobrar')}
-          onSaveDraft={() => console.log('Pausar')}
-        />
-
-        {showAmbiguity && (
-          <DisambiguationPanel 
-            options={mockAmbiguousOptions}
-            onSelect={() => { setShowAmbiguity(false); setOrbState('success'); }}
-            onCancel={() => { setShowAmbiguity(false); setOrbState('standby'); }}
+      {/* 2. APP SHELL (Ocupa el resto del espacio) */}
+      <div className="flex-1 overflow-hidden">
+        <AppShell
+          headerProps={{
+            connectionStatus: connectionState,
+            moduleName: "Venta Principal",
+          }}
+          voiceProps={{
+            status: orbState,
+            transcriptText: showAmbiguity ? "agrega una coca" : "agrega tres maruchan de habanero",
+            isPartialTranscript: orbState === 'listening',
+            detectedIntention: showAmbiguity ? "BÚSQUEDA_AMBIGUA" : "TRANSACCIÓN_VENTA",
+            interpretations: showAmbiguity 
+              ? [{ id: '1', text: 'Detectada intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Entidad: "coca" (Múltiples coincidencias)', status: 'error' }] 
+              : [{ id: '1', text: 'Intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Cantidad: 3', status: 'success', semanticType: 'quantity' }, { id: '3', text: 'Producto: Sopa Maruchan Habanero', status: 'pending', semanticType: 'product' }],
+            availableCommands: showAmbiguity 
+              ? ['Opción 1', 'Opción 2', 'La de 600 mililitros', 'Ninguna'] 
+              : ['Cobrar venta', 'Aplicar descuento', 'Cancelar', 'Buscar producto'],
+          }}
+        >
+          <ProcessStepBar 
+            steps={saleSteps} 
+            currentStep={currentStep} 
+            contextMessage={stepMode === 'context' ? 'Selecciona una operación para comenzar' : undefined}
           />
-        )}
-      </AppShell>
 
-      {/* === CONTROLES DE MOCKING FLOTANTES (Solo para Desarrollo) === */}
-      <div className="fixed bottom-0 left-0 w-full p-4 bg-surface-recessed border-t border-surface-bright-edge/30 flex justify-between items-center z-50">
-        
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Carrito:</span>
-          {renderButton(cartStatus === 'empty', () => setCartStatus('empty'), 'Vacío')}
-          {renderButton(cartStatus === 'active', () => setCartStatus('active'), 'Activo')}
-          {renderButton(cartStatus === 'frozen', () => setCartStatus('frozen'), 'Congelado')}
-          
-          <div className="w-[1px] h-4 bg-surface-bright-edge mx-2"></div>
-          
-          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Micrófono:</span>
-          {renderButton(orbState === 'standby', () => setOrbState('standby'), 'Standby')}
-          {renderButton(orbState === 'listening', () => setOrbState('listening'), 'Listening')}
-          {renderButton(orbState === 'processing', () => setOrbState('processing'), 'Processing')}
-          {renderButton(orbState === 'success', () => setOrbState('success'), 'Success')}
-          {renderButton(orbState === 'error', () => setOrbState('error'), 'Error')}
-        </div>
+          <CartPanel 
+            status={cartStatus}
+            items={cartStatus === 'empty' ? [] : mockCartItems}
+            totals={{ subtotal: 67.50, discount: 10.50, iva: 9.12, total: 66.12 }}
+            onIncreaseItem={(id) => console.log('Aumentar', id)}
+            onDecreaseItem={(id) => console.log('Reducir', id)}
+            onDeleteItem={(id) => console.log('Eliminar', id)}
+            onCharge={() => { setStepMode('linear'); setCurrentStep(2); }} 
+            onSaveDraft={() => console.log('Pausar')}
+          />
 
-        <div className="flex items-center gap-2">
-          {renderButton(showAmbiguity, () => { setShowAmbiguity(!showAmbiguity); if (!showAmbiguity) setOrbState('ambiguity'); }, 'Panel Ambigüedad')}
-          
-          <div className="w-[1px] h-4 bg-surface-bright-edge mx-2"></div>
+          {currentStep === 2 && stepMode === 'linear' && (
+            <PaymentPanel
+              totals={{ subtotal: 67.50, discount: 10.50, iva: 9.12, total: 66.12, folio: 'TXN-84920' }}
+              items={mockCartItems}
+              onCancel={() => setCurrentStep(1)} 
+              onConfirm={(method, received, change) => {
+                console.log('Pago confirmado:', { method, received, change });
+                setCurrentStep(3); 
+                setOrbState('success');
+              }}
+            />
+          )}
 
-          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Flujo:</span>
-          {renderButton(stepMode === 'context', () => setStepMode('context'), 'Libre')}
-          
-          <button
-            onClick={() => { setStepMode('linear'); setCurrentStep((prev) => (prev + 1) % saleSteps.length); }}
-            className="px-3 py-1.5 rounded text-xs transition-all duration-200 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface flex items-center gap-1 font-medium ml-1"
-          >
-            Avanzar Paso &rarr;
-          </button>
-
-          <div className="w-[1px] h-4 bg-surface-bright-edge mx-2"></div>
-          
-          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest mr-2">Red:</span>
-          {renderButton(connectionState === 'online', () => setConnectionState('online'), 'ON')}
-          {renderButton(connectionState === 'local', () => setConnectionState('local'), 'LOC')}
-          {renderButton(connectionState === 'offline', () => setConnectionState('offline'), 'OFF')}
-        </div>
-
+          {showAmbiguity && (
+            <DisambiguationPanel 
+              options={mockAmbiguousOptions}
+              onSelect={() => { setShowAmbiguity(false); setOrbState('success'); }}
+              onCancel={() => { setShowAmbiguity(false); setOrbState('standby'); }}
+            />
+          )}
+        </AppShell>
       </div>
-      {/* Agregamos un botón para volver al login y probar el flujo */}
-      <div className="fixed bottom-20 left-4 z-50">
-          <button 
-            onClick={() => setCurrentView('login')}
-            className="px-4 py-2 bg-surface-container border border-[#9B4444]/30 text-[#9B4444] text-xs rounded-full shadow-lg hover:bg-[#9B4444]/20"
-          >
-            &larr; Volver al Login
-          </button>
-      </div>
-    </>
+
+    </div>
   );
 }

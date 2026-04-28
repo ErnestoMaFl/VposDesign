@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Mic, Pause } from 'lucide-react';
+import { ShoppingBag, Mic, Hourglass } from 'lucide-react';
 import { CartLineItem } from './CartLineItem';
 import { CartSummaryFooter } from './CartSummaryFooter';
 
@@ -41,7 +41,6 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative">
       
-      {/* Estilos para animaciones */}
       <style>{`
         @keyframes slide-up-fade {
           from { opacity: 0; transform: translateY(10px); }
@@ -51,13 +50,14 @@ export const CartPanel: React.FC<CartPanelProps> = ({
           animation: slide-up-fade 0.4s ease-out forwards;
         }
         
-        /* "Respiración" para el estado de pausa */
-        @keyframes breathe {
-          0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0,0,0,0.3); }
-          50% { transform: scale(1.03); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        @keyframes flip-sand {
+          0% { transform: rotate(0deg) translateY(0); }
+          40% { transform: rotate(180deg) translateY(-10px); }
+          60% { transform: rotate(180deg) translateY(0); }
+          100% { transform: rotate(360deg) translateY(0); }
         }
-        .animate-breathe {
-          animation: breathe 3s ease-in-out infinite;
+        .animate-sand {
+          animation: flip-sand 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
       `}</style>
 
@@ -89,15 +89,20 @@ export const CartPanel: React.FC<CartPanelProps> = ({
       ) : (
         <div className="flex-1 flex flex-col overflow-hidden relative">
           
-          {/* Overlay de estado Congelado/Pausado con Animación */}
+          {/* OVERLAY: Estado Congelado Corregido (Transparencia y Recuadro Gris) */}
           {status === 'frozen' && (
-            <div className="absolute inset-0 z-30 bg-surface-base/40 backdrop-blur-[2px] flex items-center justify-center cursor-not-allowed transition-all duration-500">
-              <div className="bg-surface-highest/95 px-6 py-3.5 rounded-full border border-surface-bright-edge/30 backdrop-blur-md animate-breathe flex items-center gap-3">
-                <Pause size={14} className="text-accent-navy" />
-                <span className="font-utility text-xs font-medium text-on-surface tracking-widest uppercase">
-                  Proceso en pausa
-                </span>
-                <div className="w-1.5 h-1.5 rounded-full bg-accent-navy animate-pulse" />
+            <div className="absolute inset-0 z-30 bg-surface-base/40 backdrop-blur-sm flex flex-col items-center justify-center cursor-not-allowed transition-all duration-500">
+              {/* Reloj Flotante */}
+              <Hourglass size={56} className="text-accent-navy animate-sand mb-6 drop-shadow-[0_0_15px_rgba(63,90,122,0.4)]" />
+              
+              {/* Recuadro de texto sólido y elegante */}
+              <div className="bg-surface-highest px-8 py-5 rounded-2xl border border-surface-bright-edge/30 shadow-[0_20px_40px_rgba(0,0,0,0.5)] text-center">
+                <h3 className="font-utility text-sm font-medium text-on-surface tracking-widest uppercase mb-1.5">
+                  Venta Suspendida
+                </h3>
+                <p className="font-utility text-xs text-on-surface-variant">
+                  El orquestador está procesando otra solicitud
+                </p>
               </div>
             </div>
           )}
@@ -106,21 +111,11 @@ export const CartPanel: React.FC<CartPanelProps> = ({
           <div className="flex-1 relative overflow-hidden flex flex-col">
             <div className="flex-1 overflow-y-auto flex flex-col gap-2 px-4 pb-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {items.map((item, index) => (
-                <div 
-                  key={item.id} 
-                  className="animate-item-enter" 
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
+                <div key={item.id} className="animate-item-enter" style={{ animationDelay: `${index * 0.05}s` }}>
                   <CartLineItem 
-                    index={index + 1}
-                    name={item.name}
-                    description={item.description}
-                    quantity={item.quantity}
-                    unitPrice={item.unitPrice}
-                    subtotal={item.subtotal}
-                    origin={item.origin}
-                    isActive={item.isActive}
-                    icon={item.icon}
+                    index={index + 1} name={item.name} description={item.description}
+                    quantity={item.quantity} unitPrice={item.unitPrice} subtotal={item.subtotal}
+                    origin={item.origin} isActive={item.isActive} icon={item.icon}
                     onIncrease={() => onIncreaseItem(item.id)}
                     onDecrease={() => onDecreaseItem(item.id)}
                     onDelete={() => onDeleteItem(item.id)}
@@ -128,22 +123,16 @@ export const CartPanel: React.FC<CartPanelProps> = ({
                 </div>
               ))}
             </div>
-
-            {/* Máscara de desvanecimiento inferior */}
             <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-surface-base to-transparent pointer-events-none z-10" />
           </div>
 
           <CartSummaryFooter 
-            subtotal={totals.subtotal} 
-            discount={totals.discount} 
-            iva={totals.iva} 
-            total={totals.total}
-            onCharge={onCharge}
-            onSaveDraft={onSaveDraft}
+            subtotal={totals.subtotal} discount={totals.discount} 
+            iva={totals.iva} total={totals.total}
+            onCharge={onCharge} onSaveDraft={onSaveDraft}
           />
         </div>
       )}
-
     </div>
   );
 };
