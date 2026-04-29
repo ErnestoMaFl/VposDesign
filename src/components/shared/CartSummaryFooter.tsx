@@ -22,9 +22,7 @@ export const CartSummaryFooter: React.FC<CartSummaryFooterProps> = ({
     new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
   return (
-    // Redujimos a rounded-t-[1.5rem]
-    // Cambiamos la sombra: la exterior es más suave, y añadimos un 'inset' claro para simular el reflejo de luz en el borde
-    <div className="w-full bg-surface-low pt-8 px-10 pb-[calc(2rem+72px)] rounded-t-[1.5rem] shadow-[0_-15px_40px_-15px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(60,65,80,0.6)] flex flex-col shrink-0 relative z-20">      
+    <div className="w-full bg-surface-low pt-8 px-10 pb-8 rounded-t-[1.5rem] shadow-[0_-15px_40px_-15px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(60,65,80,0.6)] flex flex-col shrink-0 relative z-20">      
       {/* Contenedor del desglose (Subtotal, Descuento, IVA) */}
       <div className="flex flex-col gap-2 mb-6">
         <div className="flex justify-between items-center">
@@ -50,7 +48,6 @@ export const CartSummaryFooter: React.FC<CartSummaryFooterProps> = ({
         </div>
       </div>
 
-      {/* Total */}
       <div className="flex justify-between items-end mb-8">
         <span className="font-utility text-lg text-on-surface-variant mb-2">Total</span>
         <span className="font-narrative text-[3.5rem] leading-tight text-on-surface tracking-wide">
@@ -63,12 +60,11 @@ export const CartSummaryFooter: React.FC<CartSummaryFooterProps> = ({
         <button 
           onClick={onSaveDraft}
           title="Pausar Venta"
-          className="w-14 h-14 flex-none flex items-center justify-center bg-surface-base hover:bg-surface-high transition-colors rounded-xl text-on-surface-variant hover:text-on-surface"
+          className="w-14 h-14 flex-none flex items-center justify-center bg-surface-base hover:bg-accent-navy/15 border border-transparent hover:border-accent-navy/30 transition-all duration-300 rounded-xl text-on-surface-variant hover:text-accent-navy"
         >
           <Save size={20} />
         </button>
         
-        {/* Botón Cobrar - Altura exacta h-14 */}
         <button 
           onClick={onCharge}
           className="h-14 flex-1 flex items-center justify-center gap-3 bg-accent-sage hover:brightness-110 transition-all rounded-xl font-utility text-base font-medium text-[#e3e2e6] shadow-[0_4px_20px_rgba(77,122,99,0.25)]"
