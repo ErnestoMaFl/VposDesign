@@ -29,10 +29,9 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Auto-cierra el sidebar al elegir una opción
   const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
     <button
-      onClick={() => { onClick(); setIsOpen(false); }}
+      onClick={onClick}
       className={`px-3 py-2 rounded-lg text-xs font-utility transition-all duration-200 text-left ${
         active 
           ? 'bg-surface-high text-on-surface shadow-sm border border-surface-bright-edge/30' 
@@ -45,7 +44,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 
   return (
     <>
-      {/* Botón Flotante para abrir (Fijado a la izquierda de la pantalla) */}
+      {/* Botón Flotante (Fijado a la izquierda de la pantalla) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed top-1/2 -translate-y-1/2 z-50 p-2 bg-surface-highest border border-surface-bright-edge/30 rounded-r-xl shadow-[5px_0_20px_rgba(0,0,0,0.5)] text-on-surface-variant hover:text-on-surface transition-all duration-300 ${
@@ -61,7 +60,6 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
           isOpen ? 'w-72' : 'w-0'
         }`}
       >
-        {/* Contenedor interno con ancho fijo para que no se deforme al animar */}
         <div className="w-72 h-full flex flex-col">
           <div className="flex items-center justify-between p-6 border-b border-surface-bright-edge/20 shrink-0">
             <div>
@@ -128,13 +126,13 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
               <div className="flex flex-col gap-2">
                 <OptionBtn active={stepMode === 'context'} onClick={() => setStepMode('context')} label="Modo Libre (Context)" />
                 <button
-                  onClick={() => { onAdvanceStep(); setIsOpen(false); }}
+                  onClick={() => { onAdvanceStep(); }}
                   className="w-full px-3 py-2 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface text-xs font-utility rounded-lg flex justify-between items-center transition-colors"
                 >
                   Avanzar Paso Lineal <span>&rarr;</span>
                 </button>
                 <button
-                  onClick={() => { setShowAmbiguity(!showAmbiguity); if (!showAmbiguity) setOrbState('ambiguity'); setIsOpen(false); }}
+                  onClick={() => { setShowAmbiguity(!showAmbiguity); if (!showAmbiguity) setOrbState('ambiguity'); }}
                   className={`w-full px-3 py-2 text-xs font-utility rounded-lg flex justify-between items-center transition-colors ${showAmbiguity ? 'bg-accent-plum text-[#e3e2e6]' : 'bg-surface-low hover:bg-surface-container text-on-surface-variant'}`}
                 >
                   Panel de Ambigüedad <span>{showAmbiguity ? 'Ocultar' : 'Mostrar'}</span>
