@@ -39,6 +39,7 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   onSaveDraft
 }) => {
   return (
+    // Contenedor Maestro: Aquí aplicamos el Overlay para que cubra TODO el panel
     <div className="flex-1 flex flex-col overflow-hidden relative">
       
       <style>{`
@@ -61,78 +62,82 @@ export const CartPanel: React.FC<CartPanelProps> = ({
         }
       `}</style>
 
-      {/* Header fijo del Carrito */}
-      <div className="pt-8 px-10 pb-4 shrink-0 flex justify-between items-center relative z-20">
-        <h2 className="font-utility text-xs text-on-surface-variant tracking-widest uppercase">
-          Carrito Actual
-        </h2>
-        {status !== 'empty' && (
-          <span className="font-utility text-xs text-on-surface-variant bg-surface-low px-2 py-0.5 rounded-full">
-            {items.length} ítems
-          </span>
+      {/* --- EL CONTENIDO REAL DEL CARRITO --- */}
+      <div className={`flex-1 flex flex-col h-full w-full ${status === 'frozen' ? 'blur-[2px] transition-all duration-500' : ''}`}>
+        
+        <div className="pt-8 px-10 pb-4 shrink-0 flex justify-between items-center relative z-20">
+          <h2 className="font-utility text-xs text-on-surface-variant tracking-widest uppercase">
+            Carrito Actual
+          </h2>
+          {status !== 'empty' && (
+            <span className="font-utility text-xs text-on-surface-variant bg-surface-low px-2 py-0.5 rounded-full">
+              {items.length} ítems
+            </span>
+          )}
+        </div>
+
+        {status === 'empty' ? (
+          <div className="flex-1 flex flex-col items-center justify-center opacity-60">
+            <div className="w-20 h-20 rounded-full bg-surface-low flex items-center justify-center mb-6 shadow-inner">
+              <ShoppingBag size={32} className="text-on-surface-variant" />
+            </div>
+            <p className="font-narrative text-2xl text-on-surface mb-2">
+              El carrito está vacío
+            </p>
+            <div className="flex items-center gap-2 text-on-surface-variant bg-surface-container px-4 py-2 rounded-full">
+              <Mic size={14} className="text-accent-sage animate-pulse" />
+              <span className="font-utility text-sm">Prueba decir: "Agrega dos cocas"</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            <div className="flex-1 relative overflow-hidden flex flex-col">
+              <div className="flex-1 overflow-y-auto flex flex-col gap-2 px-4 pb-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {items.map((item, index) => (
+                  <div key={item.id} className="animate-item-enter" style={{ animationDelay: `${index * 0.05}s` }}>
+                    <CartLineItem 
+                      index={index + 1} name={item.name} description={item.description}
+                      quantity={item.quantity} unitPrice={item.unitPrice} subtotal={item.subtotal}
+                      origin={item.origin} isActive={item.isActive} icon={item.icon}
+                      onIncrease={() => onIncreaseItem(item.id)}
+                      onDecrease={() => onDecreaseItem(item.id)}
+                      onDelete={() => onDeleteItem(item.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-surface-base to-transparent pointer-events-none z-10" />
+            </div>
+
+            <div className="mt-auto shrink-0 w-full bg-surface-base relative z-20">
+              <CartSummaryFooter 
+                subtotal={totals.subtotal} discount={totals.discount} 
+                iva={totals.iva} total={totals.total}
+                onCharge={onCharge} onSaveDraft={onSaveDraft}
+              />
+            </div>
+          </div>
         )}
       </div>
 
-      {status === 'empty' ? (
-        <div className="flex-1 flex flex-col items-center justify-center opacity-60">
-          <div className="w-20 h-20 rounded-full bg-surface-low flex items-center justify-center mb-6 shadow-inner">
-            <ShoppingBag size={32} className="text-on-surface-variant" />
-          </div>
-          <p className="font-narrative text-2xl text-on-surface mb-2">
-            El carrito está vacío
-          </p>
-          <div className="flex items-center gap-2 text-on-surface-variant bg-surface-container px-4 py-2 rounded-full">
-            <Mic size={14} className="text-accent-sage animate-pulse" />
-            <span className="font-utility text-sm">Prueba decir: "Agrega dos cocas"</span>
-          </div>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col overflow-hidden relative">
-          
-          {/* OVERLAY: Estado Congelado Corregido (Transparencia y Recuadro Gris) */}
-          {status === 'frozen' && (
-            <div className="absolute inset-0 z-30 bg-surface-base/40 backdrop-blur-sm flex flex-col items-center justify-center cursor-not-allowed transition-all duration-500">
-              {/* Reloj Flotante */}
-              <Hourglass size={56} className="text-accent-navy animate-sand mb-6 drop-shadow-[0_0_15px_rgba(63,90,122,0.4)]" />
-              
-              {/* Recuadro de texto sólido y elegante */}
-              <div className="bg-surface-highest px-8 py-5 rounded-2xl border border-surface-bright-edge/30 shadow-[0_20px_40px_rgba(0,0,0,0.5)] text-center">
-                <h3 className="font-utility text-sm font-medium text-on-surface tracking-widest uppercase mb-1.5">
-                  Venta Suspendida
-                </h3>
-                <p className="font-utility text-xs text-on-surface-variant">
-                  El orquestador está procesando otra solicitud
-                </p>
-              </div>
+      {/* --- OVERLAY: VENTA EN ESPERA (Cubre todo el panel) --- */}
+      {status === 'frozen' && (
+        <div className="absolute inset-0 z-30 bg-surface-base/40 backdrop-blur-sm flex flex-col items-center justify-center cursor-not-allowed animate-in fade-in duration-500">
+          <Hourglass size={64} className="text-accent-navy animate-sand mb-6 drop-shadow-[0_0_20px_rgba(63,90,122,0.4)]" />
+          <div className="flex flex-col items-center">
+            <h3 className="font-narrative text-4xl text-on-surface mb-3 drop-shadow-md">
+              Venta en Espera
+            </h3>
+            <div className="flex items-center gap-2 text-accent-navy">
+              <span className="w-2 h-2 rounded-full bg-accent-navy animate-pulse shadow-[0_0_8px_rgba(63,90,122,0.8)]" />
+              <span className="font-utility text-xs font-medium tracking-[0.2em] uppercase">
+                Procesando orden
+              </span>
             </div>
-          )}
-
-          {/* Área Scrolleable de Ítems */}
-          <div className="flex-1 relative overflow-hidden flex flex-col">
-            <div className="flex-1 overflow-y-auto flex flex-col gap-2 px-4 pb-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              {items.map((item, index) => (
-                <div key={item.id} className="animate-item-enter" style={{ animationDelay: `${index * 0.05}s` }}>
-                  <CartLineItem 
-                    index={index + 1} name={item.name} description={item.description}
-                    quantity={item.quantity} unitPrice={item.unitPrice} subtotal={item.subtotal}
-                    origin={item.origin} isActive={item.isActive} icon={item.icon}
-                    onIncrease={() => onIncreaseItem(item.id)}
-                    onDecrease={() => onDecreaseItem(item.id)}
-                    onDelete={() => onDeleteItem(item.id)}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-surface-base to-transparent pointer-events-none z-10" />
           </div>
-
-          <CartSummaryFooter 
-            subtotal={totals.subtotal} discount={totals.discount} 
-            iva={totals.iva} total={totals.total}
-            onCharge={onCharge} onSaveDraft={onSaveDraft}
-          />
         </div>
       )}
+
     </div>
   );
 };
