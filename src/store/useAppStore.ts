@@ -3,6 +3,16 @@ import type { VoiceOrbState } from '@/types/voice';
 import type { ConnectionState } from '@/types/system';
 import type { CartStatus } from '@/types/cart';
 
+export interface HomeMetrics {
+  salesToday: number;
+  salesTotal: number;
+  trend: number;
+  lowStockCount: number;
+  pendingItems: number;
+  topCategory: string;
+  pendingOrders: number;
+}
+
 interface AppState {
   // --- VARIABLES DE ESTADO ---
   orbState: VoiceOrbState;
@@ -11,6 +21,7 @@ interface AppState {
   showAmbiguity: boolean;
   connectionState: ConnectionState;
   cartStatus: CartStatus;
+  homeMetrics: HomeMetrics;
 
   // --- ACCIONES GLOBALES ---
   setOrbState: (state: VoiceOrbState) => void;
@@ -19,6 +30,7 @@ interface AppState {
   setShowAmbiguity: (show: boolean) => void;
   setConnectionState: (state: ConnectionState) => void;
   setCartStatus: (status: CartStatus) => void;
+  setHomeMetrics: (metrics: Partial<HomeMetrics>) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -29,6 +41,15 @@ export const useAppStore = create<AppState>((set) => ({
   showAmbiguity: false,
   connectionState: 'online',
   cartStatus: 'active',
+  homeMetrics: {
+    salesToday: 142,
+    salesTotal: 4250.00,
+    trend: 12,
+    lowStockCount: 3,
+    pendingItems: 18,
+    topCategory: 'Bebidas',
+    pendingOrders: 2,
+  },
 
   // Mutadores
   setOrbState: (orbState) => set({ orbState }),
@@ -37,4 +58,5 @@ export const useAppStore = create<AppState>((set) => ({
   setShowAmbiguity: (showAmbiguity) => set({ showAmbiguity }),
   setConnectionState: (connectionState) => set({ connectionState }),
   setCartStatus: (cartStatus) => set({ cartStatus }),
+  setHomeMetrics: (metrics) => set((state) => ({ homeMetrics: { ...state.homeMetrics, ...metrics } })),
 }));
