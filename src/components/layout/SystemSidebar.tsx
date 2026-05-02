@@ -18,13 +18,13 @@ interface SystemSidebarProps {
   onAdvanceStep: () => void;
   onGoToLogin: () => void;
   onGoToSplash: () => void;
+  onGoToHome: () => void;
   mockError: boolean;
   setMockError: (v: boolean) => void;
   mockRecovery: boolean;
   setMockRecovery: (v: boolean) => void;
 }
 
-// OptionBtn limpio, afuera del componente, con todas sus clases correctas
 const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
   <button
     onClick={onClick}
@@ -44,7 +44,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
   orbState, setOrbState,
   stepMode, setStepMode,
   showAmbiguity, setShowAmbiguity,
-  onAdvanceStep, onGoToLogin,
+  onAdvanceStep, onGoToLogin, onGoToHome,
   mockError, setMockError,
   mockRecovery, setMockRecovery
 }) => {
@@ -80,13 +80,20 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 
           <div className="flex-1 p-4 flex flex-col gap-4 overflow-hidden">
             
-            {/* SIMULADORES DIRECTOS (Sin configuraciones, puro botón de acción) */}
+            {/* SIMULADORES DIRECTOS */}
             <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
               <div className="flex items-center gap-2 text-on-surface-variant mb-1">
                 <Play size={12} />
                 <span className="font-utility text-[10px] uppercase tracking-widest">Ejecutar Flujos Completos</span>
               </div>
               
+              <button 
+                onClick={() => { setIsOpen(false); onGoToHome(); }} 
+                className="w-full mb-2 py-1.5 bg-surface-container hover:bg-surface-high border border-surface-bright-edge/30 text-on-surface text-[10px] rounded transition-colors tracking-widest uppercase font-medium"
+              >
+                &larr; Volver al Home
+              </button>
+
               <button 
                 onClick={() => { setMockError(false); setMockRecovery(false); onGoToLogin(); }} 
                 className="w-full py-1.5 bg-surface-base hover:bg-surface-container border border-surface-bright-edge/30 text-on-surface-variant text-[10px] rounded hover:text-on-surface transition-colors tracking-widest uppercase"
