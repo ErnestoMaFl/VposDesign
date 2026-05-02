@@ -11,6 +11,7 @@ import { DisambiguationPanel } from '@/features/voice/DisambiguationPanel';
 interface MainPOSScreenProps {
   onGoToLogin: () => void;
   onGoToSplash: () => void;
+  onGoToHome: () => void;
   mockError: boolean;
   setMockError: (v: boolean) => void;
   mockRecovery: boolean;
@@ -18,11 +19,10 @@ interface MainPOSScreenProps {
 }
 
 export const MainPOSScreen = ({
-  onGoToLogin, onGoToSplash, mockError, setMockError, mockRecovery, setMockRecovery
+  onGoToLogin, onGoToSplash, onGoToHome, mockError, setMockError, mockRecovery, setMockRecovery // <-- Agregado
 }: MainPOSScreenProps) => {
   
-  // ✅ PRÁCTICA DE ALTO RENDIMIENTO: Selectores atómicos
-  // Solo nos suscribimos a los cambios específicos, evitando re-renders masivos
+  // Selectores atómicos
   const orbState = useAppStore((state) => state.orbState);
   const stepMode = useAppStore((state) => state.stepMode);
   const currentStep = useAppStore((state) => state.currentStep);
@@ -30,7 +30,6 @@ export const MainPOSScreen = ({
   const connectionState = useAppStore((state) => state.connectionState);
   const cartStatus = useAppStore((state) => state.cartStatus);
 
-  // Las acciones (funciones) nunca cambian, por lo que extraerlas así es ultra seguro
   const setOrbState = useAppStore((state) => state.setOrbState);
   const setStepMode = useAppStore((state) => state.setStepMode);
   const setCurrentStep = useAppStore((state) => state.setCurrentStep);
@@ -51,6 +50,7 @@ export const MainPOSScreen = ({
         onAdvanceStep={() => { setStepMode('linear'); setCurrentStep((currentStep + 1) % saleSteps.length); }}
         onGoToLogin={onGoToLogin}
         onGoToSplash={onGoToSplash}
+        onGoToHome={onGoToHome}
         mockError={mockError} setMockError={setMockError}
         mockRecovery={mockRecovery} setMockRecovery={setMockRecovery}
       />
