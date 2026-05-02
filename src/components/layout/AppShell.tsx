@@ -1,8 +1,8 @@
 import React from 'react';
-import { HeaderBar, type ConnectionState } from './HeaderBar';
-import { VoicePanel } from './VoicePanel';
-import type { VoiceOrbState } from './VoiceOrb';
-import type { InterpretationItem } from './VoicePanel';
+import { HeaderBar } from "@/components/layout/HeaderBar";
+import type { ConnectionState } from "@/types/system";
+import { VoicePanel } from "@/features/voice/VoicePanel";
+import type { VoiceOrbState, InterpretationItem } from "@/types/voice";
 
 interface AppShellProps {
   // Contenido dinámico que cambiará según la pantalla

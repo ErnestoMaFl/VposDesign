@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Wifi, WifiOff, Server, User, ChevronDown, Bell } from 'lucide-react';
-
-export type ConnectionState = 'online' | 'local' | 'offline';
+import type { ConnectionState } from '@/types/system';
 
 interface HeaderBarProps {
   moduleName?: string;

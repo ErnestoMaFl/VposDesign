@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Delete, ArrowLeft } from 'lucide-react';
-import { ProcessStepBar } from './ProcessStepBar';
+import { ProcessStepBar } from "@/components/ui/ProcessStepBar";
 
 const mockCashiers = [
   { id: '1', name: 'Ana López', role: 'Cajera Principal', avatar: 'AL' },

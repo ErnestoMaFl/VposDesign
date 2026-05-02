@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Banknote, CreditCard, ArrowLeft, Delete, CheckCircle2 } from 'lucide-react';
-import { type CartItemType } from './CartPanel';
+import type { CartItemType } from "@/types/cart";
 
 export type PaymentMethod = 'cash' | 'card' | null;
 

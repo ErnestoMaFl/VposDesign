@@ -37,3 +37,69 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
+
+/* --- VoiceOrb Animations --- */
+@keyframes listening-pulse {
+  0%, 100% { 
+    background-color: #4D7A63;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(77,122,99,0.3);
+  }
+  50% { 
+    background-color: #459964;
+    transform: scale(1.10);
+    box-shadow: 0 0 40px rgba(69,153,100,0.5);
+  }
+}
+
+.animate-listening {
+  animation: listening-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes graze {
+  0% { background-position: 200% 50%; }
+  100% { background-position: -100% 50%; }
+}
+
+.processing-gradient {
+  background: linear-gradient(
+    110deg, 
+    #31353F 30%,   
+    #6F528C 50%,   
+    #31353F 70%    
+  );
+  background-size: 300% 100%; 
+  animation: graze 4s linear infinite; 
+}
+
+/* --- CartPanel Animations --- */
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-item-enter {
+  animation: slide-up-fade 0.4s ease-out forwards;
+}
+
+@keyframes flip-sand {
+  0% { transform: rotate(0deg) translateY(0); }
+  40% { transform: rotate(180deg) translateY(-10px); }
+  60% { transform: rotate(180deg) translateY(0); }
+  100% { transform: rotate(360deg) translateY(0); }
+}
+
+.animate-sand {
+  animation: flip-sand 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* --- DisambiguationPanel Animations --- */
+@keyframes pressure-blink {
+  0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 6px rgba(155,68,68,0.6)); }
+  50% { opacity: 0.5; transform: scale(1.05); filter: drop-shadow(0 0 0px rgba(155,68,68,0)); }
+}
+
+.animate-pressure {
+  animation: pressure-blink 1.0s ease-in-out infinite;
+  color: #9B4444;
+}

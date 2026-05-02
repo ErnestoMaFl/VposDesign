@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ProcessStepBar } from './ProcessStepBar';
-import { SessionRecoveryCard } from './SessionRecoveryCard';
+import { ProcessStepBar } from "@/components/ui/ProcessStepBar";
+import { SessionRecoveryCard } from "@/features/recovery/SessionRecoveryCard";
 import { WifiOff } from 'lucide-react';
 
 interface SplashScreenProps {

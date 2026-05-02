@@ -1,19 +1,9 @@
 import React from 'react';
 import { Loader2, XCircle, Mic, Cpu, Plus, Banknote, Hash, Package, Search } from 'lucide-react';
-import { VoiceOrb, type VoiceOrbState } from './VoiceOrb';
-
-// --- TIPOS ---
-export type InterpretationStatus = 'success' | 'pending' | 'error';
-export type SemanticType = 'add' | 'charge' | 'quantity' | 'product' | 'search' | 'unknown';
-
-export interface InterpretationItem {
-  id: string;
-  text: string;
-  status: InterpretationStatus;
-  semanticType?: SemanticType;
-}
-
-// --- SUB-COMPONENTES INTERNOS ---
+import { VoiceOrb } from "@/components/ui/VoiceOrb";
+import type { VoiceOrbState } from "@/types/voice";
+// Reemplaza la línea 4 con esto:
+import type { InterpretationItem, InterpretationStatus, SemanticType } from "@/types/voice";
 
 const TranscriptDisplay: React.FC<{ text: string; isPartial: boolean; intention?: string }> = ({ text, isPartial, intention }) => (
   <div className="flex flex-col items-center text-center space-y-3 w-full">

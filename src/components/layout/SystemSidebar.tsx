@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Settings2, X, Wifi, ShoppingBag, Mic, Route, LogOut, Play } from 'lucide-react';
-import { type VoiceOrbState } from './VoiceOrb';
-import { type ConnectionState } from './HeaderBar';
-import { type CartStatus } from './CartPanel';
+import type { VoiceOrbState } from "@/types/voice";
+import type { ConnectionState } from "@/types/system";
+import type { CartStatus } from '@/types/cart';
 
 interface SystemSidebarProps {
   connectionState: ConnectionState;
@@ -24,6 +24,20 @@ interface SystemSidebarProps {
   setMockRecovery: (v: boolean) => void;
 }
 
+// OptionBtn limpio, afuera del componente, con todas sus clases correctas
+const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
+  <button
+    onClick={onClick}
+    className={`px-3 py-1.5 rounded-lg text-xs font-utility transition-all duration-200 text-center flex-1 ${
+      active 
+        ? 'bg-surface-high text-on-surface shadow-sm border border-surface-bright-edge/30' 
+        : 'bg-transparent text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+    }`}
+  >
+    {label}
+  </button>
+);
+
 export const SystemSidebar: React.FC<SystemSidebarProps> = ({
   connectionState, setConnectionState,
   cartStatus, setCartStatus,
@@ -35,19 +49,6 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
   mockRecovery, setMockRecovery
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1.5 rounded-lg text-xs font-utility transition-all duration-200 text-center flex-1 ${
-        active 
-          ? 'bg-surface-high text-on-surface shadow-sm border border-surface-bright-edge/30' 
-          : 'bg-transparent text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
-      }`}
-    >
-      {label}
-    </button>
-  );
 
   return (
     <>

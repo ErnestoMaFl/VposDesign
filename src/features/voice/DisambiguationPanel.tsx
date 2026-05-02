@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, X } from 'lucide-react';
-import { DisambiguationCard, type DisambiguationOption } from './DisambiguationCard';
+import { DisambiguationCard, type DisambiguationOption } from "@/components/ui/DisambiguationCard";
 
 interface DisambiguationPanelProps {
   options: DisambiguationOption[];
@@ -30,17 +30,6 @@ export const DisambiguationPanel: React.FC<DisambiguationPanelProps> = ({
 
   return (
     <div className="absolute inset-0 z-40 flex flex-col items-center justify-center px-8 bg-surface-highest/60 backdrop-blur-md">
-      
-      <style>{`
-        @keyframes pressure-blink {
-          0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 6px rgba(155,68,68,0.6)); }
-          50% { opacity: 0.5; transform: scale(1.05); filter: drop-shadow(0 0 0px rgba(155,68,68,0)); }
-        }
-        .animate-pressure {
-          animation: pressure-blink 1.0s ease-in-out infinite;
-          color: #9B4444;
-        }
-      `}</style>
       
       {/* FIX: Cambiado a max-w-2xl para que las opciones no se vean apretadas */}
       <div className="w-full max-w-2xl flex flex-col">

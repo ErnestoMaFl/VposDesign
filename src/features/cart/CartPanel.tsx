@@ -1,21 +1,8 @@
 import React from 'react';
 import { ShoppingBag, Mic, Hourglass } from 'lucide-react';
-import { CartLineItem } from './CartLineItem';
+import { CartLineItem } from "@/components/ui/CartLineItem";
 import { CartSummaryFooter } from './CartSummaryFooter';
-
-export type CartStatus = 'empty' | 'active' | 'frozen';
-
-export interface CartItemType {
-  id: string;
-  name: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  subtotal: number;
-  origin: 'voice' | 'touch';
-  isActive?: boolean;
-  icon?: React.ReactNode;
-}
+import type { CartStatus, CartItemType } from '@/types/cart';
 
 interface CartPanelProps {
   status: CartStatus;
@@ -41,26 +28,6 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   return (
     // Contenedor Maestro: Aquí aplicamos el Overlay para que cubra TODO el panel
     <div className="flex-1 flex flex-col overflow-hidden relative">
-      
-      <style>{`
-        @keyframes slide-up-fade {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-item-enter {
-          animation: slide-up-fade 0.4s ease-out forwards;
-        }
-        
-        @keyframes flip-sand {
-          0% { transform: rotate(0deg) translateY(0); }
-          40% { transform: rotate(180deg) translateY(-10px); }
-          60% { transform: rotate(180deg) translateY(0); }
-          100% { transform: rotate(360deg) translateY(0); }
-        }
-        .animate-sand {
-          animation: flip-sand 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-      `}</style>
 
       {/* --- EL CONTENIDO REAL DEL CARRITO --- */}
       <div className={`flex-1 flex flex-col h-full w-full ${status === 'frozen' ? 'blur-[2px] transition-all duration-500' : ''}`}>
