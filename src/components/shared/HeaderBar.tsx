@@ -5,7 +5,7 @@ export type ConnectionState = 'online' | 'local' | 'offline';
 
 interface HeaderBarProps {
   moduleName?: string;
-  breadcrumb?: string;
+  breadcrumb?: string; // Lo mantenemos en la interfaz por si acaso, pero ya no lo renderizamos
   cashierName?: string;
   role?: string;
   shift?: string;
@@ -14,7 +14,6 @@ interface HeaderBarProps {
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   moduleName = "Venta Activa",
-  breadcrumb = "VPOS",
   cashierName = "Ernesto Macias",
   role = "Cajera",
   shift = "Turno Matutino",
@@ -45,13 +44,15 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   return (
     <div className="w-full h-16 px-8 flex items-center justify-between shrink-0 bg-surface-base z-20">
       
-      {/* Lado Izquierdo: Miga de pan y Módulo */}
-      <div className="flex items-baseline gap-3">
-        <span className="font-utility text-xs font-medium text-on-surface-variant uppercase tracking-widest">
-          {breadcrumb}
-        </span>
-        <span className="text-on-surface-variant text-xs">/</span>
-        <span className="font-utility text-sm font-medium text-on-surface">
+      {/* Lado Izquierdo: Logo y Módulo (VPOS removido) */}
+      <div className="flex items-center gap-3">
+        {/* Logo estilo Plata/Grayscale */}
+        <img 
+          src="/logo.webp" 
+          alt="Logo"
+          className="w-10 h-10 object-contain opacity-90 mix-blend-screen drop-shadow-[0_0_8px_rgba(77,122,99,0.3)]"
+        />
+        <span className="font-utility text-sm font-medium text-on-surface ml-1">
           {moduleName}
         </span>
       </div>

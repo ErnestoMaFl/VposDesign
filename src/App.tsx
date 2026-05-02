@@ -10,6 +10,7 @@ import { AuthShell } from "./components/shared/AuthShell";
 import { LoginScreen } from "./components/shared/LoginScreen";
 import { PaymentPanel } from "./components/shared/PaymentPanel";
 import { SystemSidebar } from "./components/shared/SystemSidebar"; 
+import { SplashScreen } from "./components/shared/SplashScreen";
 
 const mockAmbiguousOptions = [
   { id: '1', name: 'Coca-Cola Original 600ml', category: 'Bebidas - PET', price: 18.50, stock: 24, confidence: 92 },
@@ -24,7 +25,9 @@ const mockCartItems: CartItemType[] = [
 ];
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'login' | 'app'>('login');
+  // EL ORDEN CORRECTO: Inicia en LOGIN
+  const [currentView, setCurrentView] = useState<'login' | 'splash' | 'app'>('login');
+  
   const [orbState, setOrbState] = useState<VoiceOrbState>('standby');
   const [stepMode, setStepMode] = useState<'linear' | 'context'>('linear');
   const [currentStep, setCurrentStep] = useState(0);
@@ -32,31 +35,40 @@ export default function App() {
   const [connectionState, setConnectionState] = useState<ConnectionState>('online');
   const [cartStatus, setCartStatus] = useState<CartStatus>('active');
 
+  const [mockError, setMockError] = useState(false);
+  const [mockRecovery, setMockRecovery] = useState(false);
+
   const saleSteps = ['Agregar', 'Descuento', 'Cobrar', 'Confirmar'];
 
+  // --- VISTA 1: LOGIN ---
   if (currentView === 'login') {
     return (
       <div className="flex w-full h-screen bg-surface-base overflow-hidden">
         <AuthShell>
-          <LoginScreen onLoginSuccess={() => setCurrentView('app')} />
+          <LoginScreen onLoginSuccess={() => setCurrentView('splash')} />
         </AuthShell>
-        <div className="fixed bottom-4 right-4 z-50">
-          <button 
-            onClick={() => setCurrentView('app')}
-            className="px-4 py-2 bg-surface-container border border-surface-bright-edge text-on-surface-variant text-xs rounded shadow-lg hover:text-on-surface"
-          >
-            Saltar Login (Mock)
-          </button>
-        </div>
       </div>
     );
   }
 
+  // --- VISTA 2: SPLASH SCREEN ---
+  if (currentView === 'splash') {
+    return (
+      <div className="flex w-full h-screen bg-surface-base overflow-hidden">
+        <AuthShell>
+          <SplashScreen 
+            onComplete={() => setCurrentView('app')} 
+            simulateError={mockError}
+            simulateRecovery={mockRecovery}
+          />
+        </AuthShell>
+      </div>
+    );
+  }
+
+  // --- VISTA 3: APP PRINCIPAL ---
   return (
-    // FIX MAESTRO: Envolvemos TODO en un contenedor Flex Horizontal general
     <div className="flex w-full h-screen bg-surface-base overflow-hidden">
-      
-      {/* 1. SIDEBAR EMPUJADOR */}
       <SystemSidebar 
         connectionState={connectionState} setConnectionState={setConnectionState}
         cartStatus={cartStatus} setCartStatus={setCartStatus}
@@ -65,9 +77,11 @@ export default function App() {
         showAmbiguity={showAmbiguity} setShowAmbiguity={setShowAmbiguity}
         onAdvanceStep={() => { setStepMode('linear'); setCurrentStep((prev) => (prev + 1) % saleSteps.length); }}
         onGoToLogin={() => setCurrentView('login')}
+        onGoToSplash={() => setCurrentView('splash')}
+        mockError={mockError} setMockError={setMockError}
+        mockRecovery={mockRecovery} setMockRecovery={setMockRecovery}
       />
 
-      {/* 2. APP SHELL (Ocupa el resto del espacio) */}
       <div className="flex-1 overflow-hidden">
         <AppShell
           headerProps={{
@@ -110,7 +124,6 @@ export default function App() {
               items={mockCartItems}
               onCancel={() => setCurrentStep(1)} 
               onConfirm={(method, received, change) => {
-                console.log('Pago confirmado:', { method, received, change });
                 setCurrentStep(3); 
                 setOrbState('success');
               }}
@@ -126,7 +139,6 @@ export default function App() {
           )}
         </AppShell>
       </div>
-
     </div>
   );
 }
