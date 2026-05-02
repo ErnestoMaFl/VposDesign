@@ -41,11 +41,13 @@ export const PaymentPanel: React.FC<PaymentPanelProps> = ({ totals, items, onCan
       {/* ===== LADO IZQUIERDO: TICKET CLÁSICO ===== */}
       <div className="w-[340px] h-full bg-surface-low border-r border-dashed border-surface-bright-edge/50 flex flex-col shadow-[15px_0_40px_rgba(0,0,0,0.15)] z-10 shrink-0">
         
-        <div className="pt-8 pb-6 px-6 text-center border-b border-dashed border-surface-bright-edge/30 shrink-0">
-          <h3 className="font-narrative text-2xl text-on-surface tracking-widest uppercase">VPOS</h3>
-          <p className="font-utility text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Ticket de Venta</p>
+        {/* Cabecera del ticket limpia, puro texto */}
+        <div className="pt-8 pb-6 px-6 text-center border-b border-dashed border-surface-bright-edge/30 shrink-0 flex flex-col items-center">
+          <h3 className="font-narrative text-2xl text-on-surface tracking-widest uppercase leading-none">VPOS</h3>
+          <p className="font-utility text-[10px] text-on-surface-variant uppercase tracking-widest mt-1.5">
+            Ticket de Venta
+          </p>
         </div>
-        
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-4 [&::-webkit-scrollbar]:hidden">
           {items.map(item => (
             <div key={item.id} className="flex justify-between items-start font-utility text-sm">
