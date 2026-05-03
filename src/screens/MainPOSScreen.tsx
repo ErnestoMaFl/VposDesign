@@ -19,10 +19,9 @@ interface MainPOSScreenProps {
 }
 
 export const MainPOSScreen = ({
-  onGoToLogin, onGoToSplash, onGoToHome, mockError, setMockError, mockRecovery, setMockRecovery // <-- Agregado
+  onGoToLogin, onGoToSplash, onGoToHome, mockError, setMockError, mockRecovery, setMockRecovery
 }: MainPOSScreenProps) => {
   
-  // Selectores atómicos
   const orbState = useAppStore((state) => state.orbState);
   const stepMode = useAppStore((state) => state.stepMode);
   const currentStep = useAppStore((state) => state.currentStep);
@@ -42,6 +41,7 @@ export const MainPOSScreen = ({
   return (
     <div className="flex w-full h-screen bg-surface-base overflow-hidden">
       <SystemSidebar 
+        variant="pos"
         connectionState={connectionState} setConnectionState={setConnectionState}
         cartStatus={cartStatus} setCartStatus={setCartStatus}
         orbState={orbState} setOrbState={setOrbState}
@@ -55,26 +55,26 @@ export const MainPOSScreen = ({
         mockRecovery={mockRecovery} setMockRecovery={setMockRecovery}
       />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         <AppShell
-          headerProps={{ connectionStatus: connectionState, moduleName: "Venta Principal" }}
+          headerProps={{ connectionStatus: connectionState, moduleName: "Venta Activa" }}
           voiceProps={{
             status: orbState,
             transcriptText: showAmbiguity ? "agrega una coca" : "agrega tres maruchan de habanero",
             isPartialTranscript: orbState === 'listening',
             detectedIntention: showAmbiguity ? "BÚSQUEDA_AMBIGUA" : "TRANSACCIÓN_VENTA",
-            interpretations: showAmbiguity 
-              ? [{ id: '1', text: 'Detectada intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Entidad: "coca" (Múltiples coincidencias)', status: 'error' }] 
+            interpretations: showAmbiguity
+              ? [{ id: '1', text: 'Detectada intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Entidad: "coca" (Múltiples coincidencias)', status: 'error' }]
               : [{ id: '1', text: 'Intención: Agregar', status: 'success', semanticType: 'add' }, { id: '2', text: 'Cantidad: 3', status: 'success', semanticType: 'quantity' }, { id: '3', text: 'Producto: Sopa Maruchan Habanero', status: 'pending', semanticType: 'product' }],
-            availableCommands: showAmbiguity 
-              ? ['Opción 1', 'Opción 2', 'La de 600 mililitros', 'Ninguna'] 
+            availableCommands: showAmbiguity
+              ? ['Opción 1', 'Opción 2', 'La de 600 mililitros', 'Ninguna']
               : ['Cobrar venta', 'Aplicar descuento', 'Cancelar', 'Buscar producto'],
           }}
         >
           <ProcessStepBar 
             steps={saleSteps} 
             currentStep={currentStep} 
-            contextMessage={stepMode === 'context' ? 'Selecciona una operación para comenzar' : undefined}
+            contextMessage={stepMode === 'context' ? 'Pausado: Esperando interacción' : undefined}
           />
 
           <CartPanel 

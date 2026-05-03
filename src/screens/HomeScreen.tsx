@@ -31,22 +31,84 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigate,
   userRole = 'Dueño'
 }) => {
-  // === SOLO IMPORTAMOS LO QUE EL HOME NECESITA ===
-  const { homeMetrics, connectionState, setConnectionState } = useAppStore();
+  const { 
+    homeMetrics, 
+    connectionState, 
+    setConnectionState, 
+    orbState, 
+    setOrbState,
+    hasPausedProcess, 
+    setHasPausedProcess
+  } = useAppStore();
+  
   const revenue = formatCurrencyParts(homeMetrics.salesTotal);
+
+  // Monitor de la Verdad (Mock dinámico reaccionando al Sidebar)
+  const getMockVoiceProps = () => {
+    switch(orbState) {
+      case 'listening':
+        return {
+          status: 'listening' as const,
+          transcriptText: "abrir inven...",
+          isPartialTranscript: true,
+          interpretations: [{ id: '1', text: 'Escuchando tu comando...', status: 'pending' as const }],
+          availableCommands: ['Termina de hablar', 'Cancela']
+        };
+      case 'processing':
+        return {
+          status: 'processing' as const,
+          transcriptText: "abrir inventario",
+          isPartialTranscript: false,
+          detectedIntention: "NAVEGACIÓN",
+          interpretations: [
+            { id: '1', text: 'Intención: Cambiar de módulo', status: 'success' as const, semanticType: 'search' as const },
+            { id: '2', text: 'Destino: Inventario', status: 'success' as const }
+          ],
+          availableCommands: ['Procesando...']
+        };
+      case 'success':
+        return {
+          status: 'success' as const,
+          transcriptText: "abrir inventario",
+          isPartialTranscript: false,
+          detectedIntention: "NAVEGACIÓN EJECUTADA",
+          interpretations: [{ id: '1', text: '✓ Navegando al módulo de Inventario', status: 'success' as const }],
+          availableCommands: ['Nueva venta', 'Consultas', 'Cerrar turno']
+        };
+      case 'error':
+        return {
+          status: 'error' as const,
+          transcriptText: "abrir refaccionaria",
+          isPartialTranscript: false,
+          detectedIntention: "NAVEGACIÓN FALLIDA",
+          interpretations: [{ id: '1', text: '✗ El módulo "refaccionaria" no existe', status: 'error' as const }],
+          availableCommands: ['Ir a inventario', 'Nueva venta', 'Ajustes']
+        };
+      default:
+        return {
+          status: 'standby' as const,
+          transcriptText: "",
+          isPartialTranscript: false,
+          interpretations: [],
+          availableCommands: ['Nueva venta', 'Ir a inventario', 'Consultas', 'Ajustes']
+        };
+    }
+  };
 
   return (
     <div className="flex w-full h-screen bg-surface-base overflow-hidden">
       
-      {/* Sidebar limpio, sin la basura del POS */}
+      {/* ¡CORREGIDO! Pasando orbState y setOrbState para que los botones funcionen */}
       <SystemSidebar 
         variant="home" 
         connectionState={connectionState} 
         setConnectionState={setConnectionState}
+        orbState={orbState}
+        setOrbState={setOrbState}
         onGoToLogin={() => console.log('Mock Login')} 
       />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         <AppShell
           headerProps={{ 
             moduleName: "Tablero Principal",
@@ -55,25 +117,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             shift: "Turno Matutino",
             connectionStatus: connectionState
           }}
-          voiceProps={{
-            status: 'standby', // En el Home la voz no está escuchando
-            transcriptText: '',
-            interpretations: [],
-            availableCommands: ['Nueva venta', 'Inventario', 'Consultas', 'Gestión', 'Cerrar turno']
-          }}
+          voiceProps={getMockVoiceProps()}
         >
+
           <div className="flex-1 flex flex-col h-full bg-surface-base overflow-hidden">
             
             <ProcessStepBar 
-              contextMessage="SELECCIONA UNA OPERACIÓN PARA COMENZAR" 
+              contextMessage="DI EL NOMBRE DE UNA OPERACIÓN O SELECCIÓNALA PARA COMENZAR" 
             />
 
             <div className="flex-1 overflow-y-auto px-10 py-8 [&::-webkit-scrollbar]:hidden">
               <div className="max-w-5xl mx-auto">
                 
-                <h3 className="font-narrative text-3xl text-[#e3e2e6] tracking-tight mb-8 shrink-0">
-                  Bienvenido.
-                </h3>
+                <div className="flex justify-between items-end mb-8 shrink-0">
+                  <h3 className="font-narrative text-3xl text-[#e3e2e6] tracking-tight">
+                    Bienvenido.
+                  </h3>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
