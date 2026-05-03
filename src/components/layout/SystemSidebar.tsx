@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings2, X, Wifi, ShoppingBag, Mic, Route, LogOut, Play, BarChart2 } from 'lucide-react';
+import { Settings2, X, Wifi, ShoppingBag, Mic, Route, LogOut, Play, BarChart2, Layers } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import type { VoiceOrbState } from "@/types/voice";
 import type { ConnectionState } from "@/types/system";
@@ -54,6 +54,10 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const setHomeMetrics = useAppStore((state) => state.setHomeMetrics);
+  
+  // Traemos el estado del Stack directo del store para controlarlo desde aquí
+  const hasPausedProcess = useAppStore((state) => state.hasPausedProcess);
+  const setHasPausedProcess = useAppStore((state) => state.setHasPausedProcess);
 
   return (
     <>
@@ -85,12 +89,26 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 
           <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto [&::-webkit-scrollbar]:hidden">
             
+            {/* ====== SECCIÓN: SIMULACIÓN DE PILA (STACK PUSH) ====== */}
+            <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
+              <div className="flex items-center gap-2 text-on-surface-variant mb-1">
+                <Layers size={12} />
+                <span className="font-utility text-[10px] uppercase tracking-widest">Pila de Procesos</span>
+              </div>
+              <button 
+                onClick={() => useAppStore.getState().addMockPausedProcess()}
+                className="w-full px-3 py-2 bg-surface-container border border-surface-bright-edge/30 text-on-surface-variant text-[11px] font-utility rounded flex justify-between items-center transition-colors hover:bg-surface-high hover:text-on-surface"
+              >
+                Simular Stack Push (Pausa) <span>+1</span>
+              </button>
+            </div>
+
             {variant === 'pos' && (
               <>
                 <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
                   <div className="flex items-center gap-2 text-on-surface-variant mb-1">
                     <Play size={12} />
-                    <span className="font-utility text-[10px] uppercase tracking-widest">Ejecutar Flujos Completos</span>
+                    <span className="font-utility text-[10px] uppercase tracking-widest">Ejecutar Flujos</span>
                   </div>
                   
                   <button 
@@ -137,7 +155,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-on-surface-variant">
                     <Mic size={12} />
-                    <span className="font-utility text-[10px] uppercase tracking-widest">Orb</span>
+                    <span className="font-utility text-[10px] uppercase tracking-widest">Orb (POS)</span>
                   </div>
                   <div className="grid grid-cols-3 gap-1 w-full">
                     <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState?.('standby')} label="Stby" />
@@ -170,32 +188,39 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
             )}
 
             {variant === 'home' && (
-              <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
-                <div className="flex items-center gap-2 text-on-surface-variant mb-1">
-                  <BarChart2 size={12} />
-                  <span className="font-utility text-[10px] uppercase tracking-widest">Métricas del Tablero</span>
+              <>
+                <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
+                  <div className="flex items-center gap-2 text-on-surface-variant mb-1">
+                    <Mic size={12} />
+                    <span className="font-utility text-[10px] uppercase tracking-widest">Orb (Home)</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 w-full">
+                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState?.('standby')} label="Standby" />
+                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState?.('listening')} label="Listening" />
+                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState?.('processing')} label="Processing" />
+                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState?.('success')} label="Success" />
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1.5 w-full">
-                  <button 
-                    onClick={() => setHomeMetrics({ salesToday: 12, salesTotal: 350.50, trend: 2, lowStockCount: 0, pendingItems: 2, topCategory: 'Pan Dulce', pendingOrders: 0 })} 
-                    className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface-variant hover:text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2"
-                  >
-                    Mañana Tranquila
-                  </button>
-                  <button 
-                    onClick={() => setHomeMetrics({ salesToday: 142, salesTotal: 4250.00, trend: 12, lowStockCount: 3, pendingItems: 18, topCategory: 'Bebidas', pendingOrders: 2 })} 
-                    className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2"
-                  >
-                    Turno Normal
-                  </button>
-                  <button 
-                    onClick={() => setHomeMetrics({ salesToday: 385, salesTotal: 18450.00, trend: 45, lowStockCount: 14, pendingItems: 42, topCategory: 'Cervezas', pendingOrders: 8 })} 
-                    className="px-2 py-1.5 bg-[#B47022]/20 hover:bg-[#B47022]/30 text-[#e3e2e6] text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2 shadow-[0_0_10px_rgba(180,112,34,0.1)]"
-                  >
-                    Hora Pico (Caos)
-                  </button>
+
+                <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
+                  <div className="flex items-center gap-2 text-on-surface-variant mb-1">
+                    <BarChart2 size={12} />
+                    <span className="font-utility text-[10px] uppercase tracking-widest">Métricas</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <button onClick={() => setHomeMetrics({ salesToday: 12, salesTotal: 350.50, trend: 2, lowStockCount: 0, pendingItems: 2, topCategory: 'Pan Dulce', pendingOrders: 0 })} className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface-variant hover:text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2">
+                      Mañana Tranquila
+                    </button>
+                    <button onClick={() => setHomeMetrics({ salesToday: 142, salesTotal: 4250.00, trend: 12, lowStockCount: 3, pendingItems: 18, topCategory: 'Bebidas', pendingOrders: 2 })} className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2">
+                      Turno Normal
+                    </button>
+                    {/* ¡CORREGIDO! Fondo naranja asqueroso eliminado */}
+                    <button onClick={() => setHomeMetrics({ salesToday: 385, salesTotal: 18450.00, trend: 45, lowStockCount: 14, pendingItems: 42, topCategory: 'Cervezas', pendingOrders: 8 })} className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2">
+                      Hora Pico (Caos)
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
             <div className="flex flex-col gap-2">
