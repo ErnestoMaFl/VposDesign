@@ -121,7 +121,7 @@ export const VoicePanel: React.FC<VoicePanelProps> = ({
   aiStats = { model: "Groq Llama 3", latency: 124, commandCount: 12 }
 }) => {
   return (
-    <div className="w-[380px] h-full bg-surface-low shadow-[-20px_0_50px_rgba(0,0,0,0.3)] z-30 flex flex-col pt-24 pb-8 relative">      
+    <div className="flex-1 w-full h-full flex flex-col pt-12 pb-8 relative overflow-hidden bg-transparent">      
       {/* Área Superior */}
       <div className="flex flex-col items-center px-8 gap-8 shrink-0">
         <VoiceOrb status={status} size="lg" />
@@ -145,7 +145,6 @@ export const VoicePanel: React.FC<VoicePanelProps> = ({
       <div className="px-8 shrink-0 mt-4">
         <AIStatusIndicator {...aiStats} />
       </div>
-
     </div>
   );
 };
