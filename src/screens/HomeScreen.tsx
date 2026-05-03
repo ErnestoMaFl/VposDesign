@@ -3,6 +3,10 @@ import { useAppStore } from '@/store/useAppStore';
 import { AppShell } from '@/components/layout/AppShell';
 import { ProcessStepBar } from '@/components/ui/ProcessStepBar';
 import { SystemSidebar } from '@/components/layout/SystemSidebar';
+// 1. Importamos los equivalentes de Lucide para los iconos pequeños
+import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+// 2. Importamos tus nuevos iconos sólidos para las tarjetas
+import { PointOfSaleIcon, Inventory2Icon, AnalyticsIcon, SettingsIcon } from '@/components/ui/SolidIcons';
 
 interface HomeScreenProps {
   onNavigate: (module: 'venta' | 'inventario' | 'consultas' | 'gestion') => void;
@@ -98,7 +102,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <div className="flex w-full h-screen bg-surface-base overflow-hidden">
       
-      {/* ¡CORREGIDO! Pasando orbState y setOrbState para que los botones funcionen */}
       <SystemSidebar 
         variant="home" 
         connectionState={connectionState} 
@@ -144,7 +147,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     <div className="absolute top-2 right-2">
-                      <span className="material-symbols-outlined fill-icon !text-[140px] text-[#4D7A63] opacity-80 group-hover:opacity-100 transition-opacity">point_of_sale</span>
+                      <PointOfSaleIcon className="w-[140px] h-[140px] text-[#4D7A63] opacity-80 group-hover:opacity-100 transition-opacity" />
                     </div>
                     
                     <div className="flex flex-col relative z-10 w-full h-full">
@@ -158,9 +161,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       <div className="mt-auto flex justify-between items-end w-full">
                         <BottomLeftMetric label="Tendencia">
                           <span className={`font-utility text-sm font-medium flex items-center gap-1 ${homeMetrics.trend >= 0 ? 'text-[#4D7A63]' : 'text-[#9B4444]'}`}>
-                            <span className="material-symbols-outlined !text-[18px]">
-                              {homeMetrics.trend >= 0 ? 'trending_up' : 'trending_down'}
-                            </span> 
+                            {homeMetrics.trend >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                             {homeMetrics.trend > 0 ? '+' : ''}{homeMetrics.trend}% /hora
                           </span>
                         </BottomLeftMetric>
@@ -187,7 +188,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     <div className="absolute top-2 right-2">
-                      <span className="material-symbols-outlined fill-icon !text-[140px] text-[#3F5A7A] opacity-80 group-hover:opacity-100 transition-opacity">inventory_2</span>
+                      <Inventory2Icon className="w-[140px] h-[140px] text-[#3F5A7A] opacity-80 group-hover:opacity-100 transition-opacity" />
                     </div>
                     
                     <div className="flex flex-col relative z-10 w-full h-full">
@@ -202,7 +203,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         <BottomLeftMetric label="Alertas">
                           {homeMetrics.lowStockCount > 0 ? (
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-sm font-utility font-medium shadow-sm transition-colors ${homeMetrics.lowStockCount > 10 ? 'bg-[#9B4444] text-[#e3e2e6] animate-pulse' : 'bg-[#B47022]/20 text-[#B47022] border border-[#B47022]/30'}`}>
-                              <span className="material-symbols-outlined fill-icon !text-[16px]">warning</span> {homeMetrics.lowStockCount} Stock Bajo
+                              <AlertTriangle size={16} className={homeMetrics.lowStockCount > 10 ? "" : "fill-[#B47022]/20"} /> 
+                              {homeMetrics.lowStockCount} Stock Bajo
                             </span>
                           ) : (
                             <span className="font-utility text-sm text-[#9ca3af]">Sin alertas</span>
@@ -239,7 +241,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                           </svg>
                         </div>
                         <div className="absolute top-2 right-2">
-                          <span className="material-symbols-outlined fill-icon !text-[140px] text-[#5C4275] opacity-80 group-hover:opacity-100 transition-opacity">analytics</span>
+                          <AnalyticsIcon className="w-[140px] h-[140px] text-[#5C4275] opacity-80 group-hover:opacity-100 transition-opacity" />
                         </div>
                         
                         <div className="flex flex-col relative z-20 w-full h-full">
@@ -279,7 +281,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                         <div className="absolute top-2 right-2 group-hover:rotate-45 transition-transform duration-700">
-                          <span className="material-symbols-outlined fill-icon !text-[140px] text-[#e3e2e6] opacity-80 group-hover:opacity-100 transition-opacity">settings</span>
+                          <SettingsIcon className="w-[140px] h-[140px] text-[#e3e2e6] opacity-80 group-hover:opacity-100 transition-opacity" />
                         </div>
                         
                         <div className="flex flex-col relative z-10 w-full h-full">
