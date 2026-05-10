@@ -30,9 +30,8 @@ interface AppState {
   connectionState: ConnectionState;
   cartStatus: CartStatus;
   homeMetrics: HomeMetrics;
-  
-  // --- NUEVO ESTADO DE LA PILA ---
   pausedProcesses: PausedProcess[];
+  appFlowState: 'login' | 'splash' | 'ready';
 
   setOrbState: (state: VoiceOrbState) => void;
   setStepMode: (mode: 'linear' | 'context') => void;
@@ -41,6 +40,8 @@ interface AppState {
   setConnectionState: (state: ConnectionState) => void;
   setCartStatus: (status: CartStatus) => void;
   setHomeMetrics: (metrics: Partial<HomeMetrics>) => void;
+  setAppFlowState: (state: 'login' | 'splash' | 'ready') => void;
+
   
   // --- NUEVOS MUTADORES DE LA PILA ---
   addMockPausedProcess: () => void;
@@ -55,6 +56,7 @@ export const useAppStore = create<AppState>((set) => ({
   showAmbiguity: false,
   connectionState: 'online',
   cartStatus: 'active',
+  appFlowState: 'login',
   homeMetrics: {
     salesToday: 142,
     salesTotal: 4250.00,
@@ -74,6 +76,7 @@ export const useAppStore = create<AppState>((set) => ({
   setConnectionState: (connectionState) => set({ connectionState }),
   setCartStatus: (cartStatus) => set({ cartStatus }),
   setHomeMetrics: (metrics) => set((state) => ({ homeMetrics: { ...state.homeMetrics, ...metrics } })),
+  setAppFlowState: (appFlowState) => set({ appFlowState }),
 
   addMockPausedProcess: () => set((state) => {
     const isSale = state.pausedProcesses.length % 2 === 0;
