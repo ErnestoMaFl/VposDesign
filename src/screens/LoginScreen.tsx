@@ -158,7 +158,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               </button>
               <button
                 onClick={handleBackspace}
-                className="h-16 flex items-center justify-center bg-surface-low hover:bg-[#9B4444]/20 hover:text-[#9B4444] rounded-xl text-on-surface-variant transition-colors"
+                className="h-16 flex items-center justify-center bg-surface-low hover:bg-error/20 hover:text-error rounded-xl text-on-surface-variant transition-colors"
               >
                 <Delete size={20} />
               </button>
