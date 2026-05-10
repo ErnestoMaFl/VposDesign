@@ -25,7 +25,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   const statusConfig = {
     online: { icon: Wifi, color: 'text-accent-sage', bg: 'bg-accent-sage', label: 'Online' },
     local: { icon: Server, color: 'text-accent-navy', bg: 'bg-accent-navy', label: 'Modo Local' },
-    offline: { icon: WifiOff, color: 'text-[#9B4444]', bg: 'bg-[#9B4444]', label: 'Offline' }
+    offline: { icon: WifiOff, color: 'text-error', bg: 'bg-error', label: 'Offline' }
   };
 
   const CurrentIcon = statusConfig[connectionStatus].icon;
@@ -81,7 +81,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
               </span>
               <div className="flex justify-between items-center">
                 <span className="font-utility text-xs text-on-surface">Base de datos</span>
-                <span className={`font-utility text-xs font-medium ${connectionStatus !== 'offline' ? 'text-accent-sage' : 'text-[#9B4444]'}`}>
+                <span className={`font-utility text-xs font-medium ${connectionStatus !== 'offline' ? 'text-accent-sage' : 'text-error'}`}>
                   {connectionStatus !== 'offline' ? 'Conectado' : 'Fallo'}
                 </span>
               </div>

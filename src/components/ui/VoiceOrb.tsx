@@ -21,8 +21,8 @@ export const VoiceOrb: React.FC<VoiceOrbProps> = ({ status = 'standby', size = '
     processing: 'processing-gradient shadow-[0_0_15px_rgba(92,66,117,0.2)] scale-100',
     
     success: 'bg-[#459964] scale-110 shadow-[0_0_40px_rgba(69,153,100,0.5)] brightness-110',
-    error: 'bg-[#9B4444] scale-100 shadow-[0_0_30px_rgba(155,68,68,0.5)]',
-    ambiguity: 'bg-[#B47022] animate-pulse scale-105 shadow-[0_0_30px_rgba(180,112,34,0.5)]',
+    error: 'bg-error scale-100 shadow-[0_0_30px_rgba(155,68,68,0.5)]',
+    ambiguity: 'bg-warning animate-pulse scale-105 shadow-[0_0_30px_rgba(180,112,34,0.5)]',
   };
 
   return (

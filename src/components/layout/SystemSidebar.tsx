@@ -31,10 +31,10 @@ interface SystemSidebarProps {
 const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
   <button
     onClick={onClick}
-    className={`px-3 py-1.5 rounded-lg text-xs font-utility transition-all duration-200 text-center flex-1 ${
+    className={`px-3 py-1.5 rounded-lg text-xs font-utility transition-colors duration-300 text-center flex-1 border ${
       active 
-        ? 'bg-surface-high text-on-surface shadow-sm border border-surface-bright-edge/30' 
-        : 'bg-transparent text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+        ? 'bg-surface-high text-on-surface shadow-sm border-surface-bright-edge/50' 
+        : 'bg-transparent text-on-surface-variant border-transparent hover:bg-surface-container/50 hover:text-on-surface'
     }`}
   >
     {label}
@@ -127,7 +127,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                   
                   <button 
                     onClick={() => { setMockError?.(true); setMockRecovery?.(false); onGoToLogin(); }} 
-                    className="w-full py-1.5 bg-[#9B4444]/10 hover:bg-[#9B4444]/20 border border-[#9B4444]/30 text-[#9B4444] text-[10px] rounded transition-colors tracking-widest uppercase"
+                    className="w-full py-1.5 bg-error/10 hover:bg-error/20 border border-error/30 text-error text-[10px] rounded transition-colors tracking-widest uppercase"
                   >
                     Simular Error de Red
                   </button>
@@ -240,7 +240,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
           <div className="p-4 border-t border-surface-bright-edge/20 shrink-0">
             <button 
               onClick={() => { setIsOpen(false); onGoToLogin(); }}
-              className="w-full px-3 py-2.5 bg-[#9B4444]/10 hover:bg-[#9B4444]/20 border border-[#9B4444]/20 text-[#9B4444] text-xs font-utility rounded-lg flex items-center justify-center gap-2 transition-colors"
+              className="w-full px-3 py-2.5 bg-error/10 hover:bg-error/20 border border-error/20 text-error text-xs font-utility rounded-lg flex items-center justify-center gap-2 transition-colors"
             >
               <LogOut size={14} />
               Cerrar Sesión

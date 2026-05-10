@@ -47,14 +47,14 @@ export const SessionRecoveryCard: React.FC<SessionRecoveryCardProps> = ({
       <div className="flex gap-4">
         <button 
           onClick={onDiscard}
-          className="flex-1 flex items-center justify-center gap-2 py-4 bg-surface-low hover:bg-[#9B4444]/15 hover:text-[#9B4444] text-on-surface-variant transition-colors rounded-xl font-utility text-sm"
+          className="flex-1 flex items-center justify-center gap-2 py-4 bg-surface-low hover:bg-error/15 hover:text-error text-on-surface-variant transition-colors rounded-xl font-utility text-sm"
         >
           <Trash2 size={16} />
           Descartar
         </button>
         <button 
           onClick={onRecover}
-          className="flex-1 flex items-center justify-center gap-2 py-4 bg-accent-sage hover:brightness-110 text-[#e3e2e6] transition-all rounded-xl font-utility text-sm shadow-[0_4px_20px_rgba(77,122,99,0.25)]"
+          className="flex-1 flex items-center justify-center gap-2 py-4 bg-accent-sage hover:brightness-110 text-[#e3e2e6] transition-all rounded-xl font-utility text-sm shadow-glow-sage"
         >
           <RefreshCw size={16} />
           Recuperar Venta

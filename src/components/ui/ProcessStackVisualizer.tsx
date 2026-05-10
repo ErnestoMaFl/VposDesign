@@ -61,14 +61,14 @@ export const ProcessStackVisualizer = () => {
         <div className="absolute inset-0 z-[100] bg-surface-base flex flex-col animate-in fade-in duration-200">
           <div className="flex justify-between items-center px-5 py-3 shrink-0 border-b border-surface-bright-edge/10">
             <div className="flex items-center gap-2">
-              <AlignLeft size={14} className="text-[#B47022]/60" />
-              <span className="font-utility text-[11px] font-medium text-[#B47022] uppercase tracking-widest">
+              <AlignLeft size={14} className="text-warning/60" />
+              <span className="font-utility text-[11px] font-medium text-warning uppercase tracking-widest">
                 Detalle • {processInModal.id}
               </span>
             </div>
             <button 
               onClick={() => setModalProcessId(null)} 
-              className="p-1 hover:bg-[#9B4444]/20 text-on-surface-variant hover:text-[#9B4444] rounded transition-colors"
+              className="p-1 hover:bg-error/20 text-on-surface-variant hover:text-error rounded transition-colors"
             >
               <X size={16} />
             </button>
@@ -105,10 +105,10 @@ export const ProcessStackVisualizer = () => {
 
       {/* --- HEADER SUPERIOR --- */}
       <div className="flex justify-between items-center mb-2 shrink-0 h-6">
-        <span className="font-utility text-[10px] text-[#B47022] uppercase tracking-widest flex items-center gap-2 font-medium">
+        <span className="font-utility text-[10px] text-warning uppercase tracking-widest flex items-center gap-2 font-medium">
           <Layers size={14} /> Pila ({processes.length})
           {!isExpanded && hasMore && !focusedProcessId && (
-            <span className="text-[#e3e2e6] bg-[#B47022]/20 px-1.5 rounded text-[9px]">
+            <span className="text-[#e3e2e6] bg-warning/20 px-1.5 rounded text-[9px]">
               + {processes.length - displayCount} ocultos
             </span>
           )}
@@ -119,12 +119,12 @@ export const ProcessStackVisualizer = () => {
           {showExpandButton && !focusedProcessId && (
             <button 
               onClick={() => setIsExpanded(!isExpanded)} 
-              className="p-1 bg-[#B47022] hover:brightness-110 border border-[#B47022] rounded text-[#0F1013] transition-all flex items-center shadow-[0_0_10px_rgba(180,112,34,0.4)]"
+              className="p-1 bg-warning hover:brightness-110 border border-warning rounded text-[#0F1013] transition-all flex items-center shadow-[0_0_10px_rgba(180,112,34,0.4)]"
             >
               {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </button>
           )}
-          <button onClick={clear} className="p-1 text-[#B47022]/60 hover:bg-[#9B4444]/10 hover:text-[#9B4444] rounded transition-colors" title="Borrar toda la pila">
+          <button onClick={clear} className="p-1 text-warning/60 hover:bg-error/10 hover:text-error rounded transition-colors" title="Borrar toda la pila">
             <Trash2 size={16} />
           </button>
         </div>
@@ -133,7 +133,7 @@ export const ProcessStackVisualizer = () => {
       {/* --- LISTA DE TARJETAS --- */}
       <div className={`
         flex-1 flex flex-col transition-all duration-300
-        ${isExpanded ? 'gap-3 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#B47022]/50 [&::-webkit-scrollbar-thumb]:rounded-full' : 'gap-1.5 overflow-hidden'}
+        ${isExpanded ? 'gap-3 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-warning/50 [&::-webkit-scrollbar-thumb]:rounded-full' : 'gap-1.5 overflow-hidden'}
       `}>
         {visibleProcesses.map((proc, i) => {
           const uniqueKey = `${proc.id}-${i}`;
@@ -162,13 +162,13 @@ export const ProcessStackVisualizer = () => {
                 ${isExpandedMode ? 'shrink-0 min-h-[140px] max-h-[180px] p-4 mb-1' : ''}
                 ${isStackedMode ? 'flex-1 p-3' : ''}
                 ${isTop 
-                  ? 'bg-[#B47022]/10 border-t border-[#B47022]/40 shadow-sm hover:bg-[#B47022]/20' 
+                  ? 'bg-warning/10 border-t border-warning/40 shadow-sm hover:bg-warning/20' 
                   : 'bg-surface-container border-t border-surface-bright-edge/30 hover:bg-surface-high'}
               `}
             >
               {/* FLECHA CENTRADA EN 35% PARA HERO MODE */}
               <div className={`absolute right-[-10%] ${isHeroMode ? 'top-[53%]' : 'top-1/2'} -translate-y-1/2 text-surface-bright-edge opacity-0 group-hover:opacity-[0.18] group-hover:right-[-5%] transition-all duration-500 pointer-events-none`}>
-                <ArrowRight size={100} className={isTop ? 'text-[#B47022]' : ''} />
+                <ArrowRight size={100} className={isTop ? 'text-warning' : ''} />
               </div>
 
               {/* ========================================================= */}
@@ -177,10 +177,10 @@ export const ProcessStackVisualizer = () => {
               {isCompactMode && (
                 <div className="flex justify-between items-center w-full h-full gap-2 relative z-10 animate-in fade-in zoom-in-95 duration-300">
                   <div className="flex flex-col justify-center min-w-0 flex-1">
-                    <span className={`font-utility text-[11px] font-medium truncate ${isTop ? 'text-[#B47022]' : 'text-on-surface'}`}>
+                    <span className={`font-utility text-[11px] font-medium truncate ${isTop ? 'text-warning' : 'text-on-surface'}`}>
                       {proc.name}
                     </span>
-                    <div className={`flex items-center gap-1.5 mt-0.5 font-utility text-[9px] ${isTop ? 'text-[#B47022]/70' : 'text-on-surface-variant'}`}>
+                    <div className={`flex items-center gap-1.5 mt-0.5 font-utility text-[9px] ${isTop ? 'text-warning/70' : 'text-on-surface-variant'}`}>
                       <span>Vol: {proc.itemCount}</span>
                       <span className="opacity-40">•</span>
                       <span>Tpo: {proc.timeAgo}</span>
@@ -194,13 +194,13 @@ export const ProcessStackVisualizer = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`font-utility text-[9px] uppercase tracking-widest ${isTop ? 'text-[#B47022]/70' : 'text-on-surface-variant'}`}>
+                    <span className={`font-utility text-[9px] uppercase tracking-widest ${isTop ? 'text-warning/70' : 'text-on-surface-variant'}`}>
                       {proc.id}
                     </span>
                     
                     <button 
                       onClick={(e) => handleDetailsClick(e, proc)} 
-                      className={`p-1 flex items-center justify-center rounded transition-colors ${isTop ? 'bg-[#B47022]/10 hover:bg-[#B47022]/20 text-[#B47022]' : 'hover:bg-surface-high text-on-surface-variant hover:text-on-surface'}`}
+                      className={`p-1 flex items-center justify-center rounded transition-colors ${isTop ? 'bg-warning/10 hover:bg-warning/20 text-warning' : 'hover:bg-surface-high text-on-surface-variant hover:text-on-surface'}`}
                       title="Ver detalles"
                     >
                       <Eye size={14} />
@@ -208,7 +208,7 @@ export const ProcessStackVisualizer = () => {
                     {processes.length > 1 && (
                       <button 
                         onClick={(e) => { e.stopPropagation(); removeProcess(proc.id); }} 
-                        className="p-1 text-on-surface-variant hover:text-[#9B4444] transition-colors rounded"
+                        className="p-1 text-on-surface-variant hover:text-error transition-colors rounded"
                         title="Eliminar proceso"
                       >
                         <Trash2 size={14} />
@@ -229,7 +229,7 @@ export const ProcessStackVisualizer = () => {
                     </h4>
                     
                     <div className="flex items-center gap-2">
-                      <span className={`font-utility text-[12px] tracking-widest uppercase ${isTop ? 'text-[#B47022]' : 'text-on-surface-variant'}`}>
+                      <span className={`font-utility text-[12px] tracking-widest uppercase ${isTop ? 'text-warning' : 'text-on-surface-variant'}`}>
                         {proc.id}
                       </span>
                       {isFocused && (
@@ -255,19 +255,19 @@ export const ProcessStackVisualizer = () => {
                     </div>
                     {proc.total > 0 && (
                       <div className="flex flex-col border-l border-surface-bright-edge/10 pl-2 justify-center">
-                        <span className="font-utility text-[8px] text-[#B47022] uppercase tracking-widest">Valor</span>
+                        <span className="font-utility text-[8px] text-warning uppercase tracking-widest">Valor</span>
                         <span className="font-narrative text-[17px] leading-tight text-[#e3e2e6]">${proc.total.toFixed(2)}</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#B47022]/30 [&::-webkit-scrollbar-thumb]:rounded-full flex flex-col justify-start">
+                  <div className="flex-1 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-warning/30 [&::-webkit-scrollbar-thumb]:rounded-full flex flex-col justify-start">
                     <p className={`font-utility text-[11px] leading-snug italic ${isTop ? 'text-[#e3e2e6]/90' : 'text-on-surface-variant'}`}>
                       "{proc.details}"
                       {proc.details.length > 80 && (
                         <button 
                           onClick={(e) => { e.stopPropagation(); setModalProcessId(proc.id); }} 
-                          className={`inline-flex items-baseline ml-1 font-bold hover:underline ${isTop ? 'text-[#B47022]' : 'text-on-surface'}`}
+                          className={`inline-flex items-baseline ml-1 font-bold hover:underline ${isTop ? 'text-warning' : 'text-on-surface'}`}
                           title="Ver bitácora"
                         >
                           [+]
@@ -284,10 +284,10 @@ export const ProcessStackVisualizer = () => {
               {isExpandedMode && (
                 <div className="flex flex-col h-full w-full relative z-10 justify-between animate-in fade-in zoom-in-95 duration-300">
                   <div className="flex justify-between items-start w-full gap-4 mb-2 shrink-0">
-                    <h4 className={`font-narrative text-xl truncate ${isTop ? 'text-[#B47022]' : 'text-on-surface'}`}>
+                    <h4 className={`font-narrative text-xl truncate ${isTop ? 'text-warning' : 'text-on-surface'}`}>
                       {proc.name}
                     </h4>
-                    <span className={`font-utility text-[11px] tracking-widest uppercase mt-0.5 shrink-0 ${isTop ? 'text-[#B47022]' : 'text-on-surface-variant'}`}>
+                    <span className={`font-utility text-[11px] tracking-widest uppercase mt-0.5 shrink-0 ${isTop ? 'text-warning' : 'text-on-surface-variant'}`}>
                       {proc.id}
                     </span>
                   </div>
@@ -301,19 +301,19 @@ export const ProcessStackVisualizer = () => {
                   <div className="flex justify-between items-end w-full mt-auto shrink-0">
                     <div className="flex items-center gap-4 font-utility">
                       <div className="flex flex-col">
-                        <span className={`text-[9px] uppercase tracking-widest mb-0.5 ${isTop ? 'text-[#B47022]/70' : 'text-on-surface-variant'}`}>Volumen</span>
+                        <span className={`text-[9px] uppercase tracking-widest mb-0.5 ${isTop ? 'text-warning/70' : 'text-on-surface-variant'}`}>Volumen</span>
                         <span className={`text-sm font-medium ${isTop ? 'text-[#e3e2e6]' : 'text-on-surface'}`}>{proc.itemCount}</span>
                       </div>
-                      <div className={`w-[1px] h-6 ${isTop ? 'bg-[#B47022]/30' : 'bg-surface-bright-edge/30'}`} />
+                      <div className={`w-[1px] h-6 ${isTop ? 'bg-warning/30' : 'bg-surface-bright-edge/30'}`} />
                       <div className="flex flex-col">
-                        <span className={`text-[9px] uppercase tracking-widest mb-0.5 ${isTop ? 'text-[#B47022]/70' : 'text-on-surface-variant'}`}>Tiempo</span>
+                        <span className={`text-[9px] uppercase tracking-widest mb-0.5 ${isTop ? 'text-warning/70' : 'text-on-surface-variant'}`}>Tiempo</span>
                         <span className={`text-sm font-medium ${isTop ? 'text-[#e3e2e6]' : 'text-on-surface'}`}>{proc.timeAgo}</span>
                       </div>
                       {proc.total > 0 && (
                         <>
-                          <div className={`w-[1px] h-6 ${isTop ? 'bg-[#B47022]/30' : 'bg-surface-bright-edge/30'}`} />
+                          <div className={`w-[1px] h-6 ${isTop ? 'bg-warning/30' : 'bg-surface-bright-edge/30'}`} />
                           <div className="flex flex-col">
-                            <span className={`text-[9px] uppercase tracking-widest mb-0.5 ${isTop ? 'text-[#B47022]' : 'text-on-surface-variant'}`}>Valor</span>
+                            <span className={`text-[9px] uppercase tracking-widest mb-0.5 ${isTop ? 'text-warning' : 'text-on-surface-variant'}`}>Valor</span>
                             <span className={`text-sm font-medium ${isTop ? 'text-[#e3e2e6]' : 'text-on-surface'}`}>${proc.total.toFixed(2)}</span>
                           </div>
                         </>
@@ -323,14 +323,14 @@ export const ProcessStackVisualizer = () => {
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button 
                         onClick={(e) => handleDetailsClick(e, proc)} 
-                        className={`p-2 rounded-lg transition-colors ${isTop ? 'bg-[#B47022]/20 hover:bg-[#B47022]/30 text-[#B47022]' : 'bg-surface-base hover:bg-surface-high text-on-surface-variant hover:text-on-surface'}`}
+                        className={`p-2 rounded-lg transition-colors ${isTop ? 'bg-warning/20 hover:bg-warning/30 text-warning' : 'bg-surface-base hover:bg-surface-high text-on-surface-variant hover:text-on-surface'}`}
                         title="Ver detalles"
                       >
                         <Eye size={16} />
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); removeProcess(proc.id); }} 
-                        className="p-2 text-on-surface-variant hover:text-[#9B4444] bg-surface-base hover:bg-[#9B4444]/15 transition-all rounded-lg"
+                        className="p-2 text-on-surface-variant hover:text-error bg-surface-base hover:bg-error/15 transition-all rounded-lg"
                         title="Eliminar proceso"
                       >
                         <Trash2 size={16} />
@@ -346,10 +346,10 @@ export const ProcessStackVisualizer = () => {
               {isStackedMode && (
                 <div className="flex flex-col h-full w-full relative z-10 justify-between animate-in fade-in zoom-in-95 duration-300">
                   <div className="flex justify-between items-start w-full gap-4">
-                    <h4 className={`font-narrative text-lg truncate ${isTop ? 'text-[#B47022]' : 'text-on-surface'}`}>
+                    <h4 className={`font-narrative text-lg truncate ${isTop ? 'text-warning' : 'text-on-surface'}`}>
                       {proc.name}
                     </h4>
-                    <span className={`font-utility text-[11px] tracking-widest uppercase mt-0.5 shrink-0 ${isTop ? 'text-[#B47022]' : 'text-on-surface-variant'}`}>
+                    <span className={`font-utility text-[11px] tracking-widest uppercase mt-0.5 shrink-0 ${isTop ? 'text-warning' : 'text-on-surface-variant'}`}>
                       {proc.id}
                     </span>
                   </div>
@@ -379,14 +379,14 @@ export const ProcessStackVisualizer = () => {
                     <div className="flex items-center gap-1 shrink-0">
                       <button 
                         onClick={(e) => handleDetailsClick(e, proc)} 
-                        className={`p-2 rounded-lg transition-all ${isTop ? 'hover:bg-[#B47022]/20 text-[#B47022]' : 'hover:bg-surface-high text-on-surface-variant hover:text-on-surface'}`}
+                        className={`p-2 rounded-lg transition-all ${isTop ? 'hover:bg-warning/20 text-warning' : 'hover:bg-surface-high text-on-surface-variant hover:text-on-surface'}`}
                         title="Ver detalles"
                       >
                         <Eye size={16} />
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); removeProcess(proc.id); }} 
-                        className="p-2 text-on-surface-variant hover:text-[#9B4444] hover:bg-[#9B4444]/15 transition-all rounded-lg"
+                        className="p-2 text-on-surface-variant hover:text-error hover:bg-error/15 transition-all rounded-lg"
                         title="Eliminar proceso"
                       >
                         <Trash2 size={16} />

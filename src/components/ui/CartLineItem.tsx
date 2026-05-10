@@ -75,13 +75,13 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
         </div>
         
         {/* Descripción en verde blanquesino (#d9eddc) */}
-        <span className="font-utility text-xs text-[#d9eddc] mt-0.5">
+        <span className="font-utility text-xs text-success-light mt-0.5">
           {description}
         </span>
       </div>
 
       {/* Precio Unitario en verde blanquesino (#d9eddc) */}
-      <div className="w-20 text-right font-utility text-sm text-[#d9eddc]">
+      <div className="w-20 text-right font-utility text-sm text-success-light">
         {formatCurrency(unitPrice)}
       </div>
 

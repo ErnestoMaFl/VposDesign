@@ -90,8 +90,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
       {showError ? (
         <div className="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="w-16 h-16 rounded-full bg-[#9B4444]/10 flex items-center justify-center mb-6">
-            <WifiOff size={32} className="text-[#9B4444]" />
+          <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mb-6">
+            <WifiOff size={32} className="text-error" />
           </div>
           <h2 className="font-narrative text-3xl text-on-surface mb-3">Error de red</h2>
           <p className="font-utility text-sm text-on-surface-variant max-w-md mb-8">

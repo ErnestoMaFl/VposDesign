@@ -30,7 +30,7 @@ const InterpretationDisplay: React.FC<{ items: InterpretationItem[] }> = ({ item
   const getSemanticIcon = (item: InterpretationItem) => {
     //Aquí sí usamos colores y animaciones
     if (item.status === 'pending') return <Loader2 size={16} className="text-accent-navy animate-spin shrink-0" />;
-    if (item.status === 'error') return <XCircle size={16} className="text-[#9B4444] shrink-0" />;
+    if (item.status === 'error') return <XCircle size={16} className="text-error shrink-0" />;
     
     // Éxito inato: Gris resaltado (on-surface-variant) para sentirse parte del panel, sin palomitas.
     const iconProps = { size: 16, className: "text-on-surface-variant/35 shrink-0" };
@@ -53,7 +53,7 @@ const InterpretationDisplay: React.FC<{ items: InterpretationItem[] }> = ({ item
         {items.map((item) => (
           <div key={item.id} className="flex items-center gap-3 py-2">
             {getSemanticIcon(item)}
-            <span className={`font-utility text-sm ${item.status === 'error' ? 'text-[#9B4444]' : 'text-on-surface'}`}>
+            <span className={`font-utility text-sm ${item.status === 'error' ? 'text-error' : 'text-on-surface'}`}>
               {item.text}
             </span>
           </div>

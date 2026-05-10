@@ -70,11 +70,11 @@ export const DisambiguationPanel: React.FC<DisambiguationPanelProps> = ({
         <div className="mt-8 flex justify-center">
           <button 
             onClick={onCancel}
-            className="group flex items-center gap-2 px-6 py-3 bg-surface-base text-on-surface-variant rounded-full transition-all duration-300 font-utility text-sm hover:bg-[#9B4444]/15 hover:text-[#9B4444]"
+            className="group flex items-center gap-2 px-6 py-3 bg-surface-base text-on-surface-variant rounded-full transition-all duration-300 font-utility text-sm hover:bg-error/15 hover:text-error"
           >
             <X size={16} className="transition-colors" />
             <span>
-              O di <span className="text-on-surface font-medium group-hover:text-[#9B4444] transition-colors">"{cancelKeyword}"</span> para cancelar
+              O di <span className="text-on-surface font-medium group-hover:text-error transition-colors">"{cancelKeyword}"</span> para cancelar
             </span>
           </button>
         </div>

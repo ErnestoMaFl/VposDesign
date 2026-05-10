@@ -67,7 +67,7 @@ export const CartSummaryFooter: React.FC<CartSummaryFooterProps> = ({
         
         <button 
           onClick={onCharge}
-          className="h-14 flex-1 flex items-center justify-center gap-3 bg-accent-sage hover:brightness-110 transition-all rounded-xl font-utility text-base font-medium text-[#e3e2e6] shadow-[0_4px_20px_rgba(77,122,99,0.25)]"
+          className="h-14 flex-1 flex items-center justify-center gap-3 bg-accent-sage hover:brightness-110 transition-all rounded-xl font-utility text-base font-medium text-[#e3e2e6] shadow-glow-sage"
         >
           <Banknote size={20} />
           Cobrar {formatCurrency(total)}

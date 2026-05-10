@@ -170,7 +170,7 @@ export const PaymentPanel: React.FC<PaymentPanelProps> = ({ totals, items, onCan
                   onClick={() => onConfirm('cash', receivedAmount, change)}
                   className={`w-full mt-1 shrink-0 h-[72px] rounded-xl font-utility text-base font-medium flex items-center justify-center gap-3 transition-all duration-300 ${
                     isSufficient 
-                      ? 'bg-accent-sage hover:brightness-110 text-[#e3e2e6] shadow-[0_4px_20px_rgba(77,122,99,0.25)] translate-y-0' 
+                      ? 'bg-accent-sage hover:brightness-110 text-[#e3e2e6] shadow-glow-sage translate-y-0' 
                       : 'bg-surface-container text-on-surface-variant cursor-not-allowed translate-y-2 opacity-50'
                   }`}
                 >
@@ -186,7 +186,7 @@ export const PaymentPanel: React.FC<PaymentPanelProps> = ({ totals, items, onCan
                     {key}
                   </button>
                 ))}
-                <button onClick={() => handleKeypad('DEL')} className="w-full h-full bg-surface-low hover:bg-[#9B4444]/20 text-on-surface-variant hover:text-[#9B4444] rounded-xl flex items-center justify-center transition-colors">
+                <button onClick={() => handleKeypad('DEL')} className="w-full h-full bg-surface-low hover:bg-error/20 text-on-surface-variant hover:text-error rounded-xl flex items-center justify-center transition-colors">
                   <Delete size={28} />
                 </button>
               </div>
