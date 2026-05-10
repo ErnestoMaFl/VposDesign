@@ -15,13 +15,31 @@
   --color-accent-navy: #3F5A7A;
   --color-accent-plum: #5C4275;
 
+  /*Colores Semánticos de Feedback */
+  --color-error: #9B4444;
+  --color-warning: #B47022;
+  --color-success-light: #d9eddc; /* Ese verde claro que usaste en las letras del carrito */
+
   /* Text */
   --color-on-surface: #e3e2e6;
   --color-on-surface-variant: #9ca3af;
 
-  /* Typography */
+  /* Typography EN produccion
   --font-utility: "Inter", sans-serif;
   --font-narrative: "DM Serif Display", serif;
+ */
+  --font-utility: "Inter";
+  --font-narrative: "DM Serif Display";
+
+  /* Sombras Semánticas y de Componentes */
+  --shadow-card-sage: 0 15px 40px -15px rgba(77, 122, 99, 0.25);
+  --shadow-card-navy: 0 15px 40px -15px rgba(63, 90, 122, 0.25);
+  --shadow-card-plum: 0 15px 40px -15px rgba(92, 66, 117, 0.25);
+  --shadow-card-neutral: 0 15px 40px -15px rgba(227, 226, 230, 0.1);
+  
+  --shadow-glow-sage: 0 4px 20px rgba(77, 122, 99, 0.25);
+  --shadow-glow-plum: 0 4px 20px rgba(92, 66, 117, 0.4);
+  --shadow-glow-warning: 0 0 10px rgba(180, 112, 34, 0.4);
 }
 
 /* Base Monolith Layer */
@@ -80,6 +98,7 @@ body {
 
 .animate-item-enter {
   animation: slide-up-fade 0.4s ease-out forwards;
+  opacity: 0;
 }
 
 @keyframes flip-sand {
