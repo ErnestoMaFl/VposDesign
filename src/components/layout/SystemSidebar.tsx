@@ -1,31 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Settings2, X, Wifi, ShoppingBag, Mic, Route, LogOut, Play, BarChart2, Layers } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import type { VoiceOrbState } from "@/types/voice";
-import type { ConnectionState } from "@/types/system";
-import type { CartStatus } from '@/types/cart';
 
 interface SystemSidebarProps {
   variant?: 'pos' | 'home'; 
-  connectionState: ConnectionState;
-  setConnectionState: (s: ConnectionState) => void;
-  onGoToLogin: () => void;
-  
-  cartStatus?: CartStatus;
-  setCartStatus?: (s: CartStatus) => void;
-  orbState?: VoiceOrbState;
-  setOrbState?: (s: VoiceOrbState) => void;
-  stepMode?: 'linear' | 'context';
-  setStepMode?: (s: 'linear' | 'context') => void;
-  showAmbiguity?: boolean;
-  setShowAmbiguity?: (s: boolean) => void;
-  onAdvanceStep?: () => void;
-  onGoToSplash?: () => void;
-  onGoToHome?: () => void;
-  mockError?: boolean;
-  setMockError?: (v: boolean) => void;
-  mockRecovery?: boolean;
-  setMockRecovery?: (v: boolean) => void;
 }
 
 const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
@@ -41,23 +20,24 @@ const OptionBtn = ({ active, onClick, label }: { active: boolean, onClick: () =>
   </button>
 );
 
-export const SystemSidebar: React.FC<SystemSidebarProps> = ({
-  variant = 'pos',
-  connectionState, setConnectionState,
-  onGoToLogin,
-  cartStatus, setCartStatus,
-  orbState, setOrbState,
-  stepMode, setStepMode,
-  showAmbiguity, setShowAmbiguity,
-  onAdvanceStep, onGoToHome,
-  setMockError, setMockRecovery
-}) => {
+export const SystemSidebar: React.FC<SystemSidebarProps> = ({ variant = 'pos' }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const setHomeMetrics = useAppStore((state) => state.setHomeMetrics);
-  
-  // Traemos el estado del Stack directo del store para controlarlo desde aquí
-  const hasPausedProcess = useAppStore((state) => state.hasPausedProcess);
-  const setHasPausedProcess = useAppStore((state) => state.setHasPausedProcess);
+  const navigate = useNavigate();
+
+  // Consumimos todo directamente del Store global
+  const {
+    connectionState, setConnectionState,
+    cartStatus, setCartStatus,
+    orbState, setOrbState,
+    stepMode, setStepMode,
+    showAmbiguity, setShowAmbiguity,
+    currentStep, setCurrentStep,
+    setAppFlowState,
+    setHomeMetrics,
+    addMockPausedProcess,
+    setMockError,
+    setMockRecovery
+  } = useAppStore();
 
   return (
     <>
@@ -89,66 +69,78 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 
           <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto [&::-webkit-scrollbar]:hidden">
             
-            {/* ====== SECCIÓN: SIMULACIÓN DE PILA (STACK PUSH) ====== */}
+            {/* ====== SECCIÓN GLOBAL: SIMULAR FLUJOS (Ahora se ve en todos lados) ====== */}
+            <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
+              <div className="flex items-center gap-2 text-on-surface-variant mb-1">
+                <Play size={12} />
+                <span className="font-utility text-[10px] uppercase tracking-widest">Ejecutar Flujos</span>
+              </div>
+              
+              {/* Botón para alternar vistas rápidamente */}
+              {variant === 'pos' ? (
+                <button 
+                  onClick={() => { setIsOpen(false); navigate('/'); }} 
+                  className="w-full mb-2 py-1.5 bg-surface-container hover:bg-surface-high border border-surface-bright-edge/30 text-on-surface text-[10px] rounded transition-colors tracking-widest uppercase font-medium"
+                >
+                  &larr; Volver al Home
+                </button>
+              ) : (
+                <button 
+                  onClick={() => { setIsOpen(false); navigate('/venta'); }} 
+                  className="w-full mb-2 py-1.5 bg-surface-container hover:bg-surface-high border border-surface-bright-edge/30 text-on-surface text-[10px] rounded transition-colors tracking-widest uppercase font-medium"
+                >
+                  Ir al POS &rarr;
+                </button>
+              )}
+
+              <button 
+                onClick={() => { setMockError(false); setMockRecovery(false); setAppFlowState('login'); }} 
+                className="w-full py-1.5 bg-surface-base hover:bg-surface-container border border-surface-bright-edge/30 text-on-surface-variant text-[10px] rounded hover:text-on-surface transition-colors tracking-widest uppercase"
+              >
+                Simular Flujo Normal
+              </button>
+              
+              <button 
+                onClick={() => { setMockError(true); setMockRecovery(false); setAppFlowState('login'); }} 
+                className="w-full py-1.5 bg-error/10 hover:bg-error/20 border border-error/30 text-error text-[10px] rounded transition-colors tracking-widest uppercase"
+              >
+                Simular Error de Red
+              </button>
+              
+              <button 
+                onClick={() => { setMockError(false); setMockRecovery(true); setAppFlowState('login'); }} 
+                className="w-full py-1.5 bg-accent-plum/10 hover:bg-accent-plum/20 border border-accent-plum/30 text-accent-plum text-[10px] rounded transition-colors tracking-widest uppercase"
+              >
+                Simular Sesión Pausada
+              </button>
+            </div>
+
+            {/* ====== SECCIÓN GLOBAL: PILA DE PROCESOS ====== */}
             <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
               <div className="flex items-center gap-2 text-on-surface-variant mb-1">
                 <Layers size={12} />
                 <span className="font-utility text-[10px] uppercase tracking-widest">Pila de Procesos</span>
               </div>
               <button 
-                onClick={() => useAppStore.getState().addMockPausedProcess()}
+                onClick={() => addMockPausedProcess()}
                 className="w-full px-3 py-2 bg-surface-container border border-surface-bright-edge/30 text-on-surface-variant text-[11px] font-utility rounded flex justify-between items-center transition-colors hover:bg-surface-high hover:text-on-surface"
               >
                 Simular Stack Push (Pausa) <span>+1</span>
               </button>
             </div>
 
+            {/* ====== MÓDULOS DEL POS ====== */}
             {variant === 'pos' && (
               <>
-                <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
-                  <div className="flex items-center gap-2 text-on-surface-variant mb-1">
-                    <Play size={12} />
-                    <span className="font-utility text-[10px] uppercase tracking-widest">Ejecutar Flujos</span>
-                  </div>
-                  
-                  <button 
-                    onClick={() => { setIsOpen(false); onGoToHome?.(); }} 
-                    className="w-full mb-2 py-1.5 bg-surface-container hover:bg-surface-high border border-surface-bright-edge/30 text-on-surface text-[10px] rounded transition-colors tracking-widest uppercase font-medium"
-                  >
-                    &larr; Volver al Home
-                  </button>
-
-                  <button 
-                    onClick={() => { setMockError?.(false); setMockRecovery?.(false); onGoToLogin(); }} 
-                    className="w-full py-1.5 bg-surface-base hover:bg-surface-container border border-surface-bright-edge/30 text-on-surface-variant text-[10px] rounded hover:text-on-surface transition-colors tracking-widest uppercase"
-                  >
-                    Simular Flujo Normal
-                  </button>
-                  
-                  <button 
-                    onClick={() => { setMockError?.(true); setMockRecovery?.(false); onGoToLogin(); }} 
-                    className="w-full py-1.5 bg-error/10 hover:bg-error/20 border border-error/30 text-error text-[10px] rounded transition-colors tracking-widest uppercase"
-                  >
-                    Simular Error de Red
-                  </button>
-                  
-                  <button 
-                    onClick={() => { setMockError?.(false); setMockRecovery?.(true); onGoToLogin(); }} 
-                    className="w-full py-1.5 bg-accent-plum/10 hover:bg-accent-plum/20 border border-accent-plum/30 text-accent-plum text-[10px] rounded transition-colors tracking-widest uppercase"
-                  >
-                    Simular Sesión Pausada
-                  </button>
-                </div>
-
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-on-surface-variant">
                     <ShoppingBag size={12} />
                     <span className="font-utility text-[10px] uppercase tracking-widest">Carrito</span>
                   </div>
                   <div className="flex gap-1 w-full">
-                    <OptionBtn active={cartStatus === 'empty'} onClick={() => setCartStatus?.('empty')} label="Vacío" />
-                    <OptionBtn active={cartStatus === 'active'} onClick={() => setCartStatus?.('active')} label="Act" />
-                    <OptionBtn active={cartStatus === 'frozen'} onClick={() => setCartStatus?.('frozen')} label="Cong" />
+                    <OptionBtn active={cartStatus === 'empty'} onClick={() => setCartStatus('empty')} label="Vacío" />
+                    <OptionBtn active={cartStatus === 'active'} onClick={() => setCartStatus('active')} label="Act" />
+                    <OptionBtn active={cartStatus === 'frozen'} onClick={() => setCartStatus('frozen')} label="Cong" />
                   </div>
                 </div>
 
@@ -158,12 +150,12 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                     <span className="font-utility text-[10px] uppercase tracking-widest">Orb (POS)</span>
                   </div>
                   <div className="grid grid-cols-3 gap-1 w-full">
-                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState?.('standby')} label="Stby" />
-                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState?.('listening')} label="List" />
-                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState?.('processing')} label="Proc" />
-                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState?.('success')} label="Ok" />
-                    <OptionBtn active={orbState === 'error'} onClick={() => setOrbState?.('error')} label="Err" />
-                    <OptionBtn active={orbState === 'ambiguity'} onClick={() => setOrbState?.('ambiguity')} label="Amb" />
+                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState('standby')} label="Stby" />
+                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState('listening')} label="List" />
+                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState('processing')} label="Proc" />
+                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState('success')} label="Ok" />
+                    <OptionBtn active={orbState === 'error'} onClick={() => setOrbState('error')} label="Err" />
+                    <OptionBtn active={orbState === 'ambiguity'} onClick={() => setOrbState('ambiguity')} label="Amb" />
                   </div>
                 </div>
 
@@ -173,13 +165,13 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                     <span className="font-utility text-[10px] uppercase tracking-widest">Flujos</span>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <button onClick={() => setStepMode?.(stepMode === 'linear' ? 'context' : 'linear')} className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface text-[11px] font-utility rounded flex justify-between items-center transition-colors">
+                    <button onClick={() => setStepMode(stepMode === 'linear' ? 'context' : 'linear')} className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface text-[11px] font-utility rounded flex justify-between items-center transition-colors">
                       Modo: {stepMode === 'linear' ? 'Lineal' : 'Libre'}
                     </button>
-                    <button onClick={onAdvanceStep} className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface text-[11px] font-utility rounded flex justify-between items-center transition-colors">
+                    <button onClick={() => setCurrentStep((currentStep + 1) % 4)} className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface text-[11px] font-utility rounded flex justify-between items-center transition-colors">
                       Avanzar Paso Lineal <span>&rarr;</span>
                     </button>
-                    <button onClick={() => { setShowAmbiguity?.(!showAmbiguity); if (!showAmbiguity) setOrbState?.('ambiguity'); }} className={`w-full px-2 py-1.5 text-[11px] font-utility rounded flex justify-between items-center transition-colors ${showAmbiguity ? 'bg-accent-plum text-[#e3e2e6]' : 'bg-surface-low hover:bg-surface-container text-on-surface-variant'}`}>
+                    <button onClick={() => { setShowAmbiguity(!showAmbiguity); if (!showAmbiguity) setOrbState('ambiguity'); }} className={`w-full px-2 py-1.5 text-[11px] font-utility rounded flex justify-between items-center transition-colors ${showAmbiguity ? 'bg-accent-plum text-[#e3e2e6]' : 'bg-surface-low hover:bg-surface-container text-on-surface-variant'}`}>
                       Ambigüedad <span>{showAmbiguity ? 'Hide' : 'Show'}</span>
                     </button>
                   </div>
@@ -187,6 +179,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
               </>
             )}
 
+            {/* ====== MÓDULOS DEL HOME ====== */}
             {variant === 'home' && (
               <>
                 <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
@@ -195,10 +188,12 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                     <span className="font-utility text-[10px] uppercase tracking-widest">Orb (Home)</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1 w-full">
-                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState?.('standby')} label="Standby" />
-                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState?.('listening')} label="Listening" />
-                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState?.('processing')} label="Processing" />
-                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState?.('success')} label="Success" />
+                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState('standby')} label="Standby" />
+                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState('listening')} label="Listening" />
+                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState('processing')} label="Processing" />
+                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState('success')} label="Success" />
+                    {/* 👇 AQUÍ ESTÁ EL ERROR QUE HACÍA FALTA */}
+                    <OptionBtn active={orbState === 'error'} onClick={() => setOrbState('error')} label="Error" />
                   </div>
                 </div>
 
@@ -214,7 +209,6 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                     <button onClick={() => setHomeMetrics({ salesToday: 142, salesTotal: 4250.00, trend: 12, lowStockCount: 3, pendingItems: 18, topCategory: 'Bebidas', pendingOrders: 2 })} className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2">
                       Turno Normal
                     </button>
-                    {/* ¡CORREGIDO! Fondo naranja asqueroso eliminado */}
                     <button onClick={() => setHomeMetrics({ salesToday: 385, salesTotal: 18450.00, trend: 45, lowStockCount: 14, pendingItems: 42, topCategory: 'Cervezas', pendingOrders: 8 })} className="px-2 py-1.5 bg-surface-container hover:bg-surface-high text-on-surface text-[11px] font-utility rounded text-left transition-colors flex items-center gap-2">
                       Hora Pico (Caos)
                     </button>
@@ -229,9 +223,9 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
                 <span className="font-utility text-[10px] uppercase tracking-widest">Red</span>
               </div>
               <div className="flex gap-1 w-full">
-                <OptionBtn active={connectionState === 'online'} onClick={() => setConnectionState(('online'))} label="On" />
-                <OptionBtn active={connectionState === 'local'} onClick={() => setConnectionState(('local'))} label="Loc" />
-                <OptionBtn active={connectionState === 'offline'} onClick={() => setConnectionState(('offline'))} label="Off" />
+                <OptionBtn active={connectionState === 'online'} onClick={() => setConnectionState('online')} label="On" />
+                <OptionBtn active={connectionState === 'local'} onClick={() => setConnectionState('local')} label="Loc" />
+                <OptionBtn active={connectionState === 'offline'} onClick={() => setConnectionState('offline')} label="Off" />
               </div>
             </div>
 
@@ -239,7 +233,7 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({
 
           <div className="p-4 border-t border-surface-bright-edge/20 shrink-0">
             <button 
-              onClick={() => { setIsOpen(false); onGoToLogin(); }}
+              onClick={() => { setIsOpen(false); setAppFlowState('login'); }}
               className="w-full px-3 py-2.5 bg-error/10 hover:bg-error/20 border border-error/20 text-error text-xs font-utility rounded-lg flex items-center justify-center gap-2 transition-colors"
             >
               <LogOut size={14} />

@@ -8,11 +8,8 @@ import { useAppStore } from '@/store/useAppStore'; // <-- NUEVO
 
 export default function App() {
   // 👇 USAMOS ZUSTAND EN LUGAR DE useState
-  const { appFlowState, setAppFlowState } = useAppStore();
+  const { appFlowState, setAppFlowState, mockError, mockRecovery } = useAppStore();
   
-  const [mockError, setMockError] = useState(false);
-  const [mockRecovery, setMockRecovery] = useState(false);
-
   if (appFlowState === 'login') {
     return (
       <AuthShell>
