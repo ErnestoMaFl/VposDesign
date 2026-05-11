@@ -1,5 +1,6 @@
 import React from 'react';
 import { Minus, Plus, Mic, Hand, Trash2, Package } from 'lucide-react'; // Agregamos Package como default
+import { formatCurrency } from '@/utils/formatters';
 
 export interface CartLineItemProps {
   index: number;
@@ -30,8 +31,6 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
   onDecrease,
   onDelete,
 }) => {
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
   return (
     <div 

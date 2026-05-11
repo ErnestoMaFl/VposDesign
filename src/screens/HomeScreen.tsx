@@ -4,19 +4,13 @@ import { useAppStore } from '@/store/useAppStore';
 import { AppShell } from '@/components/layout/AppShell';
 import { ProcessStepBar } from '@/components/ui/ProcessStepBar';
 import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { formatCurrencyParts } from '@/utils/formatters';
 
 import { PointOfSaleIcon, Inventory2Icon, AnalyticsIcon, SettingsIcon } from '@/components/ui/SolidIcons';
 
 interface HomeScreenProps {
   userRole?: 'Dueño' | 'Cajero'; 
 }
-
-const formatCurrencyParts = (amount: number) => {
-  const parts = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).formatToParts(amount);
-  const whole = parts.filter(p => p.type !== 'fraction' && p.type !== 'decimal').map(p => p.value).join('');
-  const fraction = parts.filter(p => p.type === 'decimal' || p.type === 'fraction').map(p => p.value).join('');
-  return { whole, fraction };
-};
 
 const BottomLeftMetric = ({ label, children }: { label: string, children: React.ReactNode }) => (
   <div className="flex flex-col justify-end pb-1 shrink-0">

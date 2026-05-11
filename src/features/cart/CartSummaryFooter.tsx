@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tag, Banknote, Save } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
 
 export interface CartSummaryFooterProps {
   subtotal: number;
@@ -18,8 +19,6 @@ export const CartSummaryFooter: React.FC<CartSummaryFooterProps> = ({
   onCharge,
   onSaveDraft,
 }) => {
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
   return (
     <div className="w-full bg-surface-low pt-8 px-10 pb-8 rounded-t-[1.5rem] shadow-[0_-15px_40px_-15px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(60,65,80,0.6)] flex flex-col shrink-0 relative z-20">      

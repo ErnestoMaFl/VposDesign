@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Banknote, CreditCard, ArrowLeft, Delete, CheckCircle2 } from 'lucide-react';
 import type { CartItemType } from "@/types/cart";
+import { formatCurrency } from '@/utils/formatters';
 
 export type PaymentMethod = 'cash' | 'card' | null;
 
@@ -18,9 +19,6 @@ export const PaymentPanel: React.FC<PaymentPanelProps> = ({ totals, items, onCan
   const receivedAmount = receivedStr === '' ? 0 : parseFloat(receivedStr);
   const change = receivedAmount - totals.total;
   const isSufficient = receivedAmount >= totals.total;
-
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
   const handleKeypad = (val: string) => {
     if (val === 'C') setReceivedStr('');

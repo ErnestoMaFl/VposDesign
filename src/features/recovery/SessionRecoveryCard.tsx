@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle, Clock, RefreshCw, Trash2 } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
 
 interface SessionRecoveryCardProps {
   saleId: string;
@@ -18,8 +19,6 @@ export const SessionRecoveryCard: React.FC<SessionRecoveryCardProps> = ({
   onRecover,
   onDiscard
 }) => {
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
   return (
     <div className="w-full max-w-md bg-surface-container rounded-2xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.4)] relative overflow-hidden animate-in fade-in zoom-in-95 duration-500">

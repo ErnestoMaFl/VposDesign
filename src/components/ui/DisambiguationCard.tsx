@@ -1,5 +1,6 @@
 import React from 'react';
 import { Package } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
 
 export interface DisambiguationOption {
   id: string;
@@ -17,8 +18,6 @@ interface DisambiguationCardProps {
 }
 
 export const DisambiguationCard: React.FC<DisambiguationCardProps> = ({ index, option, onSelect }) => {
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
   return (
     <div 
