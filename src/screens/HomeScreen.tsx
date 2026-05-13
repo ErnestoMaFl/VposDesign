@@ -83,7 +83,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ userRole = 'Dueño' }) =
       stepContextMessage="DI EL NOMBRE DE UNA OPERACIÓN O SELECCIÓNALA PARA COMENZAR"
       title="Bienvenido."
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pb-8 [&::-webkit-scrollbar]:hidden min-h-0">
         
         {/* CARD 1: VENTA */}
         <PanelCard
