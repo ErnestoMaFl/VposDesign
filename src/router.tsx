@@ -19,16 +19,17 @@ export const router = createBrowserRouter([
         path: 'venta',
         element: <MainPOSScreen /> // Eager: El cajero lo necesita SIN DELAY
       },
-      
-      // 🟢 LAZY LOADING (Importaciones dinámicas nativas de RR v7)
-      // Estas pantallas SOLO se descargan si el usuario entra a la ruta.
-      /*{
+      {
         path: 'inventario',
         async lazy() {
           const { InventarioScreen } = await import('@/screens/InventarioScreen');
           return { Component: InventarioScreen };
         }
       },
+      
+      // 🟢 LAZY LOADING (Importaciones dinámicas nativas de RR v7)
+      // Estas pantallas SOLO se descargan si el usuario entra a la ruta.
+      /*
       {
         path: 'consultas',
         async lazy() {

@@ -129,6 +129,40 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({ variant = 'pos' })
               </button>
             </div>
 
+            {/* ====== SECCIÓN GLOBAL: MOCKS INVENTARIO ====== */}
+            <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
+              <div className="flex items-center gap-2 text-on-surface-variant mb-1">
+                <Layers size={12} />
+                <span className="font-utility text-[10px] uppercase tracking-widest">Mocks Inventario</span>
+              </div>
+              <div className="flex flex-col gap-1.5 w-full">
+                
+                {/* CORRECCIÓN: Obligamos a ejecutar resetInventory() al hacer clic */}
+                <button 
+                  onClick={() => { 
+                    useAppStore.getState().resetInventory(); 
+                    navigate('/inventario'); 
+                  }} 
+                  className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-on-surface text-[11px] font-utility rounded flex justify-between items-center transition-colors"
+                >
+                  Ir a Pantalla Inventario <span>&rarr;</span>
+                </button>
+                
+                {/* CORRECCIÓN: Reseteamos, navegamos y lanzamos el loop limpio */}
+                <button 
+                  onClick={() => { 
+                    useAppStore.getState().resetInventory();
+                    navigate('/inventario'); 
+                    setTimeout(useAppStore.getState().startMockScanningLoop, 500); 
+                  }} 
+                  className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-accent-sage text-[11px] font-utility rounded flex justify-between items-center transition-colors"
+                >
+                  Auto-iniciar Escaneo <span><Play size={10}/></span>
+                </button>
+                
+              </div>
+            </div>
+
             {/* ====== MÓDULOS DEL POS ====== */}
             {variant === 'pos' && (
               <>
@@ -188,12 +222,12 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({ variant = 'pos' })
                     <span className="font-utility text-[10px] uppercase tracking-widest">Orb (Home)</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1 w-full">
-                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState('standby')} label="Standby" />
-                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState('listening')} label="Listening" />
-                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState('processing')} label="Processing" />
-                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState('success')} label="Success" />
-                    {/* 👇 AQUÍ ESTÁ EL ERROR QUE HACÍA FALTA */}
-                    <OptionBtn active={orbState === 'error'} onClick={() => setOrbState('error')} label="Error" />
+                    <OptionBtn active={orbState === 'standby'} onClick={() => setOrbState('standby')} label="Stby" />
+                    <OptionBtn active={orbState === 'listening'} onClick={() => setOrbState('listening')} label="List" />
+                    <OptionBtn active={orbState === 'processing'} onClick={() => setOrbState('processing')} label="Proc" />
+                    <OptionBtn active={orbState === 'success'} onClick={() => setOrbState('success')} label="Ok" />
+                    <OptionBtn active={orbState === 'error'} onClick={() => setOrbState('error')} label="Err" />
+                    <OptionBtn active={orbState === 'ambiguity'} onClick={() => setOrbState('ambiguity')} label="Amb" />
                   </div>
                 </div>
 

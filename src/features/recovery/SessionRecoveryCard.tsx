@@ -53,7 +53,7 @@ export const SessionRecoveryCard: React.FC<SessionRecoveryCardProps> = ({
         </button>
         <button 
           onClick={onRecover}
-          className="flex-1 flex items-center justify-center gap-2 py-4 bg-accent-sage hover:brightness-110 text-[#e3e2e6] transition-all rounded-xl font-utility text-sm shadow-glow-sage"
+          className="flex-1 flex items-center justify-center gap-2 py-4 bg-accent-plum/90 hover:brightness-120 text-on-surface transition-all rounded-xl font-utility text-sm shadow-glow-plum"
         >
           <RefreshCw size={16} />
           Recuperar Venta
