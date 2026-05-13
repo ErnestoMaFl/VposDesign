@@ -44,3 +44,27 @@ export const SettingsIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+export const QuickScanIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" className={className}>
+    <path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 240v-113q-106-14-173-93.5T200-520h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 109-67 188.5T520-273v113h-40Z"/>
+  </svg>
+);
+
+export const ReceivePackageIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" className={className}>
+    <path d="M440-200h80v-167l64 63 56-56-160-160-160 160 56 56 64-63v167ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T760-80H240Zm280-520v-200H240v640h520v-440H520ZM240-800v200-200 640-640Z"/>
+  </svg>
+);
+
+export const ManualAdjustIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" className={className}>
+    <path d="M440-120v-240h80v80h320v80H520v80h-80Zm-320-80v-80h240v80H120Zm160-160v-80H120v-80h160v-80h80v240h-80Zm160-80v-80h400v80H440Z"/>
+  </svg>
+);
+
+export const ShrinkageIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" className={className}>
+    <path d="M480-120q-33 0-56.5-23.5T400-200q0-33 23.5-56.5T480-280q33 0 56.5 23.5T560-200q0 33-23.5 56.5T480-120Zm-40-240v-440h80v440h-80Z"/>
+  </svg>
+);
+
