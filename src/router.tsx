@@ -5,6 +5,7 @@ import { RootLayout } from '@/components/layout/RootLayout';
 // Estas pantallas se empaquetan en el bundle principal. Cargan al instante.
 import { HomeScreen } from '@/screens/HomeScreen';
 import { MainPOSScreen } from '@/screens/MainPOSScreen';
+import { ConsultasScreen } from '@/screens/ConsultasScreen';
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
         element: <MainPOSScreen /> // Eager: El cajero lo necesita SIN DELAY
       },
       {
+        path: 'consultas',
+        element: <ConsultasScreen /> // <-- Ahora carga al instante
+      },
+      {
         path: 'inventario',
         async lazy() {
           const { InventarioScreen } = await import('@/screens/InventarioScreen');
@@ -30,13 +35,7 @@ export const router = createBrowserRouter([
       // 🟢 LAZY LOADING (Importaciones dinámicas nativas de RR v7)
       // Estas pantallas SOLO se descargan si el usuario entra a la ruta.
       /*
-      {
-        path: 'consultas',
-        async lazy() {
-          const { ConsultasScreen } = await import('@/screens/ConsultasScreen');
-          return { Component: ConsultasScreen };
-        }
-      },
+      
       {
         path: 'gestion',
         async lazy() {

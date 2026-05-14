@@ -1,4 +1,3 @@
-import React from 'react';
 import { mockCartItems, mockAmbiguousOptions } from '@/mocks/dummyData';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -7,6 +6,7 @@ import { ProcessStepBar } from '@/components/ui/ProcessStepBar';
 import { CartPanel } from '@/features/cart/CartPanel';
 import { PaymentPanel } from '@/features/payment/PaymentPanel';
 import { DisambiguationPanel } from '@/features/voice/DisambiguationPanel';
+import { QuickQueryModal } from '@/features/analytics/QuickQueryModal';
 
 // ¡Adiós a las interfaces con props de navegación y mocks!
 // Ahora React Router y RootLayout se encargan de eso.
@@ -79,6 +79,8 @@ export const MainPOSScreen = () => {
           onCancel={() => { setShowAmbiguity(false); setOrbState('standby'); }}
         />
       )}
+
+      <QuickQueryModal />
     </AppShell>
   );
 };
