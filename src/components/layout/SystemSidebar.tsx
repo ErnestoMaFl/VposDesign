@@ -36,7 +36,9 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({ variant = 'pos' })
     setHomeMetrics,
     addMockPausedProcess,
     setMockError,
-    setMockRecovery
+    setMockRecovery,
+    clearHistory, 
+    simulateQueryResponse
   } = useAppStore();
 
   return (
@@ -158,6 +160,57 @@ export const SystemSidebar: React.FC<SystemSidebarProps> = ({ variant = 'pos' })
                   className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-accent-sage text-[11px] font-utility rounded flex justify-between items-center transition-colors"
                 >
                   Auto-iniciar Escaneo <span><Play size={10}/></span>
+                </button>
+                
+              </div>
+            </div>
+
+            {/* ====== SECCIÓN GLOBAL: MOCKS CONSULTAS ====== */}
+            <div className="flex flex-col gap-2 pb-3 border-b border-surface-bright-edge/20">
+              <div className="flex items-center gap-2 text-on-surface-variant mb-1">
+                <BarChart2 size={12} />
+                <span className="font-utility text-[10px] uppercase tracking-widest">Mocks Consultas</span>
+              </div>
+              <div className="flex flex-col gap-1.5 w-full">
+                
+                {/* 1. Limpiar historial */}
+                <button 
+                  onClick={() => { 
+                    clearHistory(); 
+                    useAppStore.getState().addMessage({
+                      id: 'welcome-1',
+                      role: 'system',
+                      content: 'Hola. Soy tu Analista de Datos. ¿Qué te gustaría saber de tu negocio hoy?',
+                      timestamp: Date.now(),
+                      variant: 'text'
+                    });
+                    navigate('/consultas'); 
+                  }} 
+                  className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-error/15 hover:border-error/30 text-on-surface hover:text-error text-[11px] font-utility rounded flex justify-between items-center transition-colors"
+                >
+                  Resetear Chat <span><X size={10}/></span>
+                </button>
+                
+                {/* 2. Flujo Oficina: Pantalla Completa */}
+                <button 
+                  onClick={() => { 
+                    navigate('/consultas'); 
+                    setTimeout(() => simulateQueryResponse('Top 5 productos más vendidos'), 500); 
+                  }} 
+                  className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-accent-plum text-[11px] font-utility rounded flex justify-between items-center transition-colors"
+                >
+                  Pantalla Completa <span><Play size={10}/></span>
+                </button>
+
+                {/* 3. Flujo Mostrador: Modal Superpuesto (Stack Push) */}
+                <button 
+                  onClick={() => { 
+                    navigate('/venta'); 
+                    setTimeout(() => useAppStore.getState().simulateQuickQuery('top 5 productos'), 200); 
+                  }} 
+                  className="w-full px-2 py-1.5 bg-surface-container border border-surface-bright-edge hover:bg-surface-high text-accent-navy text-[11px] font-utility rounded flex justify-between items-center transition-colors"
+                >
+                  Stack Push Modal <span><Play size={10}/></span>
                 </button>
                 
               </div>
