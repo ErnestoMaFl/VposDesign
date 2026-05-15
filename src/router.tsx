@@ -31,6 +31,13 @@ export const router = createBrowserRouter([
           return { Component: InventarioScreen };
         }
       },
+      {
+        path: 'gestion',
+        async lazy() {
+          const { GestionScreen } = await import('@/screens/GestionScreen');
+          return { Component: GestionScreen };
+        }
+      }
       
       // 🟢 LAZY LOADING (Importaciones dinámicas nativas de RR v7)
       // Estas pantallas SOLO se descargan si el usuario entra a la ruta.
