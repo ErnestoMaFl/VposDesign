@@ -4,6 +4,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { simulateHybridSearch } from './mockSearchEngine';
 import { formatCurrency } from '@/utils/formatters';
+import { escapeRegExp, normalizeSearchText } from '@/utils/textNormalization';
 import type { SearchResult, MatchEngine } from './types';
 import { BarcodeScannerModal } from './BarcodeScannerModal';
 
@@ -12,22 +13,26 @@ interface HybridSearchInputProps {
   onChange: (val: string) => void;
   isListening?: boolean;
   placeholder?: string;
-  
   withDropdown?: boolean;
   onSelectResult?: (result: SearchResult) => void;
+  onMicClick?: () => void;
 }
 
+// Función HighlightText segura contra caracteres especiales y con colores de alto contraste
 const HighlightText = ({ text, query }: { text: string; query: string }) => {
-  if (!query) return <span className="text-on-surface-variant">{text}</span>;
-  const regex = new RegExp(`(${query})`, 'gi');
+  if (!query) return <span className="text-[#a1a1aa]">{text}</span>;
+  
+  const safeQuery = escapeRegExp(query);
+  const regex = new RegExp(`(${safeQuery})`, 'gi');
   const parts = text.split(regex);
+  
   return (
     <span>
       {parts.map((part, i) => 
         regex.test(part) ? (
-          <span key={i} className="text-[#e3e2e6] font-bold">{part}</span>
+          <span key={i} className="text-white font-bold">{part}</span>
         ) : (
-          <span key={i} className="text-on-surface-variant">{part}</span>
+          <span key={i} className="text-[#a1a1aa]">{part}</span>
         )
       )}
     </span>
@@ -38,12 +43,13 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
   value, 
   onChange, 
   isListening, 
-  placeholder = "Busca por nombre, SKU o alias...",
+  placeholder = "Buscar producto manual o escanear...",
   withDropdown = false,
-  onSelectResult
+  onSelectResult,
+  onMicClick
 }) => {
   const [localValue, setLocalValue] = useState(value);
-  const debouncedValue = useDebounce(localValue, 300);
+  const debouncedValue = useDebounce(localValue, 200);
 
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -53,6 +59,7 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listboxRef = useRef<HTMLUListElement>(null);
 
   useOnClickOutside(containerRef, () => setIsOpen(false));
 
@@ -64,27 +71,51 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
     if (value !== localValue && value !== debouncedValue) {
       setLocalValue(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  // Búsqueda con prevención de Race Conditions
   useEffect(() => {
     if (!withDropdown) return;
-    if (!debouncedValue.trim()) {
+    
+    const normalizedQuery = normalizeSearchText(debouncedValue);
+    
+    if (!normalizedQuery) {
       setResults([]);
       setIsOpen(false);
       return;
     }
 
+    let isCancelled = false;
+
     const fetchResults = async () => {
       setIsLoading(true);
       setIsOpen(true);
+      
       const data = await simulateHybridSearch(debouncedValue);
-      setResults(data);
-      setIsLoading(false);
-      setSelectedIndex(-1);
+      
+      if (!isCancelled) {
+        setResults(data);
+        setIsLoading(false);
+        setSelectedIndex(-1);
+      }
     };
+    
     fetchResults();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [debouncedValue, withDropdown]);
+
+  // Scroll automático al navegar con el teclado (flechas)
+  useEffect(() => {
+    if (selectedIndex >= 0 && listboxRef.current) {
+      const activeItem = listboxRef.current.children[selectedIndex] as HTMLElement;
+      if (activeItem) {
+        activeItem.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [selectedIndex]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!withDropdown || !isOpen || results.length === 0) return;
@@ -127,12 +158,14 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-2xl">
-      {/* TU DISEÑO ORIGINAL INTACTO */}
-      <div className={`relative flex items-center w-full bg-surface-recessed shadow-inner transition-colors z-50
+    <div ref={containerRef} className="relative w-full">
+      
+      {/* El Input */}
+      <div 
+        className={`relative flex items-center w-full bg-[#0B0D10] transition-colors z-50
         ${isOpen && withDropdown 
-          ? 'border-t border-accent-navy/50 shadow-[inset_0_0_15px_rgba(63,90,122,0.1)] rounded-t-xl rounded-b-none' 
-          : 'border border-surface-bright-edge/10 focus-within:border-accent-navy/50 rounded-xl'
+          ? 'border-t border-surface-bright-edge/40 shadow-[inset_0_2px_15px_rgba(0,0,0,0.8)] rounded-t-xl rounded-b-none' 
+          : 'border border-surface-bright-edge/10 focus-within:border-surface-bright-edge/40 focus-within:shadow-[inset_0_2px_15px_rgba(0,0,0,0.8)] rounded-xl'
         }`}
       >
         <div className="pl-4 pr-2 text-on-surface-variant">
@@ -142,6 +175,10 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
         <input
           ref={inputRef}
           type="text"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-controls="search-results-listbox"
+          aria-autocomplete="list"
           value={localValue}
           onChange={(e) => {
             setLocalValue(e.target.value);
@@ -150,14 +187,14 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => { if (withDropdown && localValue) setIsOpen(true); }}
           placeholder={placeholder}
-          className="flex-1 bg-transparent border-none outline-none py-4 text-on-surface font-utility text-sm placeholder:text-on-surface-variant/50"
+          className="flex-1 bg-transparent border-none outline-none py-4 text-on-surface font-utility text-base placeholder:text-on-surface-variant/50"
           autoComplete="off"
           spellCheck="false"
         />
         
-        {/* Zona Derecha Original + Escáner */}
-        <div className="flex items-center gap-2 pr-4">
-          <div className="flex gap-1">
+        {/* ZONA DE BOTONES DERECHOS */}
+        <div className="flex items-center gap-1 pr-3">
+          <div className="flex gap-1 mr-2">
             <span className="w-5 h-5 flex items-center justify-center rounded bg-surface-base text-[9px] font-bold text-accent-sage border border-surface-bright-edge/20" title="Búsqueda por Trigramas">T</span>
             <span className="w-5 h-5 flex items-center justify-center rounded bg-surface-base text-[9px] font-bold text-accent-navy border border-surface-bright-edge/20" title="Búsqueda Fonética">F</span>
             <span className="w-5 h-5 flex items-center justify-center rounded bg-surface-base text-[9px] font-bold text-accent-plum border border-surface-bright-edge/20" title="Búsqueda Semántica">S</span>
@@ -165,28 +202,38 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
 
           <div className="w-[1px] h-6 bg-surface-bright-edge/30 mx-1" />
           
-          {/* EL BOTÓN DEL ESCÁNER AÑADIDO SIN ROMPER EL ESTILO */}
           <button 
             onClick={() => setIsScannerOpen(true)}
-            className="text-on-surface-variant hover:text-accent-sage transition-colors focus:outline-none"
+            className="p-2 text-on-surface-variant hover:text-accent-sage transition-colors focus:outline-none"
             title="Escanear Código de Barras"
           >
-            <ScanLine size={18} />
+            <ScanLine size={20} />
           </button>
           
-          <Mic size={18} className={`transition-colors duration-300 ${isListening ? 'text-accent-sage animate-pulse' : 'text-on-surface-variant'}`} />
+          <button 
+            onClick={onMicClick}
+            className={`p-2 transition-colors duration-300 focus:outline-none ${isListening ? 'text-accent-sage animate-pulse' : 'text-on-surface-variant hover:text-accent-sage'}`}
+            title="Activar micrófono"
+          >
+            <Mic size={20} />
+          </button>
         </div>
       </div>
 
-      {/* EL DROPDOWN (Solo se activa si withDropdown es true) */}
+      {/* RESULTADOS DEL DROPDOWN */}
       {withDropdown && isOpen && (
-        <div className="absolute top-full left-0 right-0 bg-surface-highest/95 backdrop-blur-xl border border-surface-bright-edge/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-b-xl overflow-hidden z-40 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full left-0 right-0 bg-[#0B0D10] border border-surface-bright-edge/30 shadow-[0_40px_80px_rgba(0,0,0,0.95)] rounded-b-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200 mt-[1px]">
           {isLoading && results.length === 0 ? (
             <div className="p-6 text-center text-on-surface-variant font-utility text-sm">
               Analizando catálogo...
             </div>
           ) : results.length > 0 ? (
-            <ul className="max-h-[340px] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-surface-bright-edge/50 [&::-webkit-scrollbar-thumb]:rounded-full py-2">
+            <ul 
+              id="search-results-listbox"
+              ref={listboxRef}
+              role="listbox" 
+              className="max-h-[260px] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-surface-bright-edge/50 [&::-webkit-scrollbar-thumb]:rounded-full py-2"
+            >
               {results.map((result, index) => {
                 const isSelected = index === selectedIndex;
                 const badge = getBadgeConfig(result.matchType);
@@ -194,21 +241,23 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
                 return (
                   <li
                     key={result.id}
+                    role="option"
+                    aria-selected={isSelected}
                     onClick={() => handleSelect(result)}
                     onMouseEnter={() => setSelectedIndex(index)}
-                    className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-colors border-l-2 ${
-                      isSelected ? 'bg-surface-high border-accent-navy' : 'bg-transparent border-transparent hover:bg-surface-low'
+                    className={`flex items-center justify-between px-5 py-3.5 cursor-pointer transition-colors border-l-2 ${
+                      isSelected ? 'bg-surface-container border-accent-navy shadow-inner' : 'bg-transparent border-transparent hover:bg-surface-low'
                     }`}
                   >
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className="w-10 h-10 rounded bg-surface-base flex items-center justify-center text-surface-bright-edge shrink-0">
+                      <div className="w-10 h-10 rounded bg-[#181A1F] border border-surface-bright-edge/20 flex items-center justify-center text-surface-bright-edge shrink-0">
                         <Package size={20} />
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="font-utility text-sm truncate">
+                        <span className="font-utility text-[15px] truncate text-on-surface">
                           <HighlightText text={result.name} query={localValue} />
                         </span>
-                        <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-2 mt-1">
                           <span className="font-utility text-[10px] text-success-light uppercase tracking-widest">{result.sku}</span>
                           <span className="w-1 h-1 rounded-full bg-surface-bright-edge/50" />
                           <span className="font-utility text-[10px] text-on-surface-variant truncate">{result.category}</span>
@@ -216,7 +265,7 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
                       </div>
                     </div>
                     <div className="flex flex-col items-end shrink-0 pl-4 gap-1.5">
-                      <span className="font-narrative text-lg text-[#e3e2e6] leading-none">{formatCurrency(result.price)}</span>
+                      <span className="font-narrative text-xl text-[#e3e2e6] leading-none">{formatCurrency(result.price)}</span>
                       <span className={`font-utility text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border ${badge.style}`}>
                         {badge.label}
                       </span>
@@ -233,7 +282,6 @@ export const HybridSearchInput: React.FC<HybridSearchInputProps> = ({
         </div>
       )}
 
-      {/* MODAL DE LA CÁMARA */}
       {isScannerOpen && (
         <BarcodeScannerModal 
           onClose={() => setIsScannerOpen(false)} 

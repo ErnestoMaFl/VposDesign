@@ -28,6 +28,6 @@ export const simulateHybridSearch = async (query: string): Promise<SearchResult[
       );
       
       resolve(results);
-    }, 400); // Simulamos 400ms de latencia de red
+    }, 20); // Simulamos 400ms de latencia de red
   });
 };
