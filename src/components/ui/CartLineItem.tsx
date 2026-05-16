@@ -1,6 +1,7 @@
 import React from 'react';
 import { Minus, Plus, Mic, Hand, Trash2, Package } from 'lucide-react'; // Agregamos Package como default
 import { formatCurrency } from '@/utils/formatters';
+import { Button } from '@/components/ui/Button';
 
 export interface CartLineItemProps {
   index: number;
@@ -112,15 +113,15 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
         </span>
       </div>
 
-      {/* Botón de Borrar */}
-      <button
+      <Button
+        variant="ghost-destructive"
+        size="icon"
         onClick={onDelete}
-        className="p-2 text-on-surface-variant hover:text-[#cc4444] hover:bg-surface-high transition-all duration-300 rounded"
         title="Eliminar ítem"
         aria-label="Eliminar ítem"
       >
         <Trash2 size={18} />
-      </button>
+      </Button>
 
     </div>
   );

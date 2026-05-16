@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, X, Maximize2, Minimize2, Eye, AlignLeft, ArrowRight, Trash2 } from 'lucide-react';
 import { useAppStore, type PausedProcess } from '@/store/useAppStore';
+import { Button } from '@/components/ui/Button';
 
 export const ProcessStackVisualizer = () => {
   const processes = useAppStore(state => state.pausedProcesses);
@@ -124,9 +125,15 @@ export const ProcessStackVisualizer = () => {
               {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </button>
           )}
-          <button onClick={clear} className="p-1 text-warning/60 hover:bg-error/10 hover:text-error rounded transition-colors" title="Borrar toda la pila">
+          <Button 
+            variant="ghost-destructive" 
+            size="icon" 
+            onClick={clear} 
+            title="Borrar toda la pila"
+            className="text-warning/60" /* Le mantenemos el tono amarillento base que tenías */
+          >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       </div>
       
@@ -206,13 +213,14 @@ export const ProcessStackVisualizer = () => {
                       <Eye size={14} />
                     </button>
                     {processes.length > 1 && (
-                      <button 
+                      <Button 
+                        variant="ghost-destructive" 
+                        size="icon" 
                         onClick={(e) => { e.stopPropagation(); removeProcess(proc.id); }} 
-                        className="p-1 text-on-surface-variant hover:text-error transition-colors rounded"
                         title="Eliminar proceso"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -328,13 +336,15 @@ export const ProcessStackVisualizer = () => {
                       >
                         <Eye size={16} />
                       </button>
-                      <button 
+                      <Button 
+                        variant="ghost-destructive" 
+                        size="icon" 
+                        className="bg-surface-base" /* Conservamos tu fondo oscuro de tarjeta */
                         onClick={(e) => { e.stopPropagation(); removeProcess(proc.id); }} 
-                        className="p-2 text-on-surface-variant hover:text-error bg-surface-base hover:bg-error/15 transition-all rounded-lg"
                         title="Eliminar proceso"
                       >
                         <Trash2 size={16} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -384,13 +394,14 @@ export const ProcessStackVisualizer = () => {
                       >
                         <Eye size={16} />
                       </button>
-                      <button 
+                      <Button 
+                        variant="ghost-destructive" 
+                        size="icon" 
                         onClick={(e) => { e.stopPropagation(); removeProcess(proc.id); }} 
-                        className="p-2 text-on-surface-variant hover:text-error hover:bg-error/15 transition-all rounded-lg"
                         title="Eliminar proceso"
                       >
                         <Trash2 size={16} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>

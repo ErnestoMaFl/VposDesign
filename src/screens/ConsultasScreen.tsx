@@ -4,6 +4,7 @@ import { CardPanelLayout } from '@/components/layout/CardPanelLayout';
 import { ConversationalQueryInterface } from '@/features/analytics/ConversationalQueryInterface';
 import { DestructiveConfirmModal } from '@/components/shared/Modals/DestructiveConfirmModal';
 import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const ConsultasScreen = () => {
   // 1. Extraemos el estado global
@@ -92,18 +93,15 @@ export const ConsultasScreen = () => {
       
       // NUEVO: Botón de Limpiar Historial en el Header
       headerAction={
-        <button 
+        <Button
+          variant="ghost-destructive"
+          size="md"
+          leftIcon={<Trash2 size={16} />}
           onClick={() => setIsClearModalOpen(true)}
-          // Solo se activa si hay más de 1 mensaje (es decir, si ya hay consultas además de la bienvenida)
-          disabled={chatHistory.length <= 1} 
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-utility text-sm transition-all duration-300 ${
-            chatHistory.length <= 1
-              ? 'bg-surface-low text-on-surface-variant opacity-40 cursor-not-allowed'
-              : 'bg-surface-low hover:bg-error/15 hover:text-error border border-transparent hover:border-error/20 text-on-surface-variant'
-          }`}
+          disabled={chatHistory.length <= 1}
         >
-          <Trash2 size={16} /> Limpiar Análisis
-        </button>
+          Limpiar Análisis
+        </Button>
       }
     >
       

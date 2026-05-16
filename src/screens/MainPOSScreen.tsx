@@ -13,6 +13,7 @@ import { QuickQueryModal } from '@/features/analytics/QuickQueryModal';
 import { HybridSearchInput } from '@/components/shared/HybridSearch/HybridSearchInput';
 import { DestructiveConfirmModal } from '@/components/shared/Modals/DestructiveConfirmModal';
 import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const MainPOSScreen = () => {
   const {
@@ -79,18 +80,16 @@ export const MainPOSScreen = () => {
             />
           </div>
           
-          <button 
-            onClick={() => setIsCancelModalOpen(true)}
+         <Button 
+            variant="destructive" 
+            size="md"
+            className="shrink-0 py-4"
+            leftIcon={<Trash2 size={18} />}
             disabled={cartStatus === 'empty'}
-            className={`shrink-0 flex items-center gap-2 px-5 py-4 rounded-xl font-utility text-sm font-medium transition-all duration-300 ${
-              cartStatus === 'empty' 
-                ? 'bg-surface-low text-on-surface-variant opacity-40 cursor-not-allowed' 
-                : 'bg-error/10 hover:bg-error/20 text-error border border-error/20 hover:border-error/40 active:scale-95'
-            }`}
+            onClick={() => setIsCancelModalOpen(true)}
           >
-            <Trash2 size={18} />
             Cancelar Venta
-          </button>
+          </Button>
         </div>
       )}
 
