@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react'; // <-- AÑADIR useState y useMemo
 import { useAppStore } from '@/store/useAppStore';
 import { Activity, AlertTriangle, CheckSquare } from 'lucide-react';
 import { QuickScanIcon, ReceivePackageIcon, ManualAdjustIcon, ShrinkageIcon } from '@/components/ui/SolidIcons';
@@ -9,6 +9,8 @@ import { ScanLogFeed } from '@/features/inventory/ScanLogFeed';
 import { DisambiguationPanel } from '@/features/voice/DisambiguationPanel';
 import { mockAmbiguousOptions } from '@/mocks/dummyData';
 import { InventoryDiscrepancyTable } from '@/features/inventory/InventoryDiscrepancyTable';
+import { DestructiveConfirmModal } from '@/components/shared/Modals/DestructiveConfirmModal';
+import { formatCurrency } from '@/utils/formatters';
 
 export const InventarioScreen = () => {
   const { 
@@ -18,18 +20,25 @@ export const InventarioScreen = () => {
     scannedLogs,
     stopMockScanningLoop,
     resetInventory,
-    // Traemos los estados para la ambigüedad
     showAmbiguity,
     resumeMockScanningLoop,
     setShowAmbiguity,
     setOrbState
   } = useAppStore();
 
+  // ESTADO PARA EL MODAL DE CONFIRMACIÓN
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
   useEffect(() => {
     return () => resetInventory();
   }, [resetInventory]);
 
-  // Función mock para finalizar el flujo por completo
+  // Cálculo del impacto neto dinámico (mismo mock de costo que en la tabla: $18.50)
+  const totalMonetaryImpact = useMemo(() => {
+    return scannedLogs.reduce((acc, log) => acc + (log.delta * 18.50), 0);
+  }, [scannedLogs]);
+
+  // Función real que aplica los ajustes
   const handleApplyAdjustments = () => {
     setOrbState('success');
     setTimeout(() => {
@@ -47,7 +56,6 @@ export const InventarioScreen = () => {
         shift: "Turno Matutino"
       }}
       voiceProps={{
-        // Actualizamos los props de voz según los 3 pasos (selección -> escaneo -> resumen)
         status: showAmbiguity ? 'ambiguity' : (inventoryMode === 'scanning' ? 'listening' : 'standby'),
         transcriptText: showAmbiguity ? "coca" : (inventoryMode === 'scanning' ? "aceite diez..." : ""),
         isPartialTranscript: inventoryMode === 'scanning' && !showAmbiguity,
@@ -69,8 +77,6 @@ export const InventarioScreen = () => {
         inventoryMode === 'scanning' ? 'Escaneo de Pasillo.' :
         'Resumen de Conteo.'
       }
-
-      // Header Action dinámico
       headerAction={
         inventoryMode === 'scanning' ? (
           <button 
@@ -84,11 +90,8 @@ export const InventarioScreen = () => {
           </button>
         ) : inventoryMode === 'summary' ? (
           <button 
-            onClick={handleApplyAdjustments}
-            // Aquí está la magia táctil: 
-            // 1. Color base al 80% (bg-[#4D7A63]/80)
-            // 2. Hover resplandece al 100% y sube la sombra
-            // 3. Active (clic) hunde el botón (scale-[0.98]) y oscurece el fondo (bg-[#3b6751])
+            // CAMBIO AQUÍ: Interceptamos el clic para abrir el modal
+            onClick={() => setIsConfirmModalOpen(true)}
             className="group flex items-center gap-3 px-8 py-3 bg-[#4D7A63]/68 hover:bg-[#4D7A63] active:bg-[#3b6751] active:scale-[0.98] transition-all duration-300 rounded-lg shadow-[0_4px_15px_rgba(77,122,99,0.2)] hover:shadow-[0_4px_25px_rgba(77,122,99,0.4)]"
           >
             <CheckSquare size={18} className="text-[#daffe8] group-active:scale-95 transition-transform" />
@@ -223,6 +226,21 @@ export const InventarioScreen = () => {
           }}
         />
       )}
+
+      {/* NUESTRO MODAL INYECTADO */}
+      <DestructiveConfirmModal
+        isOpen={isConfirmModalOpen}
+        title="¿Confirmar impacto contable?"
+        description={`Se aplicarán los ajustes al inventario actualizando el stock teórico. El impacto contable neto estimado es de ${totalMonetaryImpact > 0 ? '+' : ''}${formatCurrency(totalMonetaryImpact)}. Esta acción no se puede deshacer.`}
+        confirmText="Sí, aplicar ajustes"
+        cancelText="Revisar de nuevo"
+        armingTimeMs={1500} // Seguro de 1.5s
+        onConfirm={() => {
+          setIsConfirmModalOpen(false);
+          handleApplyAdjustments(); // Ejecutar flujo real
+        }}
+        onCancel={() => setIsConfirmModalOpen(false)}
+      />
 
     </CardPanelLayout>
   );

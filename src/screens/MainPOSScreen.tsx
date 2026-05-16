@@ -1,3 +1,4 @@
+import { useState } from 'react'; // <-- AÑADIR useState
 import { mockCartItems, mockAmbiguousOptions } from '@/mocks/dummyData';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -8,28 +9,34 @@ import { PaymentPanel } from '@/features/payment/PaymentPanel';
 import { DisambiguationPanel } from '@/features/voice/DisambiguationPanel';
 import { QuickQueryModal } from '@/features/analytics/QuickQueryModal';
 
-// ¡Adiós a las interfaces con props de navegación y mocks!
-// Ahora React Router y RootLayout se encargan de eso.
+// <-- NUEVOS IMPORTS
+import { HybridSearchInput } from '@/components/shared/HybridSearch/HybridSearchInput';
+import { DestructiveConfirmModal } from '@/components/shared/Modals/DestructiveConfirmModal';
+import { Trash2 } from 'lucide-react';
 
 export const MainPOSScreen = () => {
-  
-  const orbState = useAppStore((state) => state.orbState);
-  const stepMode = useAppStore((state) => state.stepMode);
-  const currentStep = useAppStore((state) => state.currentStep);
-  const showAmbiguity = useAppStore((state) => state.showAmbiguity);
-  const connectionState = useAppStore((state) => state.connectionState);
-  const cartStatus = useAppStore((state) => state.cartStatus);
-
-  const setOrbState = useAppStore((state) => state.setOrbState);
-  const setStepMode = useAppStore((state) => state.setStepMode);
-  const setCurrentStep = useAppStore((state) => state.setCurrentStep);
-  const setShowAmbiguity = useAppStore((state) => state.setShowAmbiguity);
+  const {
+    orbState, stepMode, currentStep, showAmbiguity, connectionState, cartStatus,
+    setOrbState, setStepMode, setCurrentStep, setShowAmbiguity, setCartStatus
+  } = useAppStore();
 
   const saleSteps = ['Agregar', 'Descuento', 'Cobrar', 'Confirmar'];
 
-  // NOTA CLAVE: Ya no devolvemos el <div className="flex..."> ni el <SystemSidebar>
-  // Devolvemos directamente el <AppShell> porque el RootLayout ya nos envuelve.
-  
+  // <-- NUEVOS ESTADOS LOCALES
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Acción real al confirmar la cancelación
+  const handleCancelSale = () => {
+    setIsCancelModalOpen(false);
+    setCartStatus('empty'); // Vaciamos el carrito en el estado global
+    setSearchQuery('');
+    
+    // Feedback visual en el Orb de Voz
+    setOrbState('success');
+    setTimeout(() => setOrbState('standby'), 1500);
+  };
+
   return (
     <AppShell
       headerProps={{ connectionStatus: connectionState, moduleName: "Venta Activa" }}
@@ -51,6 +58,41 @@ export const MainPOSScreen = () => {
         currentStep={currentStep} 
         contextMessage={stepMode === 'context' ? 'Selecciona una operación para comenzar' : undefined}
       />
+
+      {/* NUEVA BARRA DE ACCIONES (Buscador Táctil + Cancelar Venta) */}
+      {/* Solo se muestra si estamos en la fase de agregar productos y no está congelado */}
+      {cartStatus !== 'frozen' && currentStep < 2 && (
+        // ARREGLO 1: z-50 para aplastar el z-20 del CartPanel. px-8 para alinear exacto.
+        <div className="px-4 pb-4 pt-2 flex gap-4 items-center z-50 relative animate-in fade-in duration-300">
+          <div className="flex-1 min-w-0">
+            <HybridSearchInput 
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Buscar producto manual o escanear..."
+              withDropdown={true}
+              onSelectResult={(res) => {
+                console.log('Agregado manual al carrito:', res);
+                setSearchQuery('');
+              }}
+              // ARREGLO 2: Le pasamos la acción para que el micrófono funcione
+              onMicClick={() => setOrbState(orbState === 'listening' ? 'standby' : 'listening')}
+            />
+          </div>
+          
+          <button 
+            onClick={() => setIsCancelModalOpen(true)}
+            disabled={cartStatus === 'empty'}
+            className={`shrink-0 flex items-center gap-2 px-5 py-4 rounded-xl font-utility text-sm font-medium transition-all duration-300 ${
+              cartStatus === 'empty' 
+                ? 'bg-surface-low text-on-surface-variant opacity-40 cursor-not-allowed' 
+                : 'bg-error/10 hover:bg-error/20 text-error border border-error/20 hover:border-error/40 active:scale-95'
+            }`}
+          >
+            <Trash2 size={18} />
+            Cancelar Venta
+          </button>
+        </div>
+      )}
 
       <CartPanel 
         status={cartStatus}
@@ -81,6 +123,19 @@ export const MainPOSScreen = () => {
       )}
 
       <QuickQueryModal />
+
+      {/* NUESTRO MODAL INYECTADO PROTEGIENDO EL CARRITO */}
+      <DestructiveConfirmModal
+        isOpen={isCancelModalOpen}
+        title="¿Cancelar venta actual?"
+        description="Se eliminarán todos los productos del carrito y se perderá el progreso. Esta acción no se puede deshacer."
+        confirmText="Sí, cancelar venta"
+        cancelText="Volver al carrito"
+        armingTimeMs={1500} // El estándar de 1.5s para no borrar 20 ítems por accidente
+        onConfirm={handleCancelSale}
+        onCancel={() => setIsCancelModalOpen(false)}
+      />
+
     </AppShell>
   );
 };
