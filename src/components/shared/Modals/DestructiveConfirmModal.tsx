@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/Button'; // Importamos tu nuevo super componente
 
 interface DestructiveConfirmModalProps {
   isOpen: boolean;
@@ -7,7 +8,6 @@ interface DestructiveConfirmModalProps {
   description: string;
   confirmText?: string;
   cancelText?: string;
-  armingTimeMs?: number; // Tiempo en milisegundos para desbloquear (default: 1500)
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -18,42 +18,10 @@ export const DestructiveConfirmModal: React.FC<DestructiveConfirmModalProps> = (
   description,
   confirmText = "Confirmar",
   cancelText = "Cancelar",
-  armingTimeMs = 1500,
   onConfirm,
   onCancel,
 }) => {
-  const [isArmed, setIsArmed] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  // Lógica de armado del modal
-  useEffect(() => {
-    if (!isOpen) {
-      setIsArmed(false);
-      setProgress(0);
-      return;
-    }
-
-    let startTime = Date.now();
-    let animationFrameId: number;
-
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const currentProgress = Math.min((elapsed / armingTimeMs) * 100, 100);
-      
-      setProgress(currentProgress);
-
-      if (currentProgress < 100) {
-        animationFrameId = requestAnimationFrame(updateProgress);
-      } else {
-        setIsArmed(true);
-      }
-    };
-
-    animationFrameId = requestAnimationFrame(updateProgress);
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isOpen, armingTimeMs]);
-
+  // Si no está abierto, no renderizamos nada
   if (!isOpen) return null;
 
   return (
@@ -77,42 +45,25 @@ export const DestructiveConfirmModal: React.FC<DestructiveConfirmModalProps> = (
           {description}
         </p>
 
-        {/* Contenedor de Botones */}
         <div className="flex w-full gap-4">
           
-          {/* Botón Secundario (Salida Segura) */}
-          <button
+          {/* Botón Secundario (Ahora con el fondo tintado azul, cero gris) */}
+          <Button
+            variant="secondary"
+            className="flex-1 py-4"
             onClick={onCancel}
-            className="flex-1 py-4 bg-surface-low hover:bg-surface-high rounded-xl font-utility text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors"
           >
             {cancelText}
-          </button>
+          </Button>
 
-          {/* Botón Primario (Destructivo con Seguro) */}
-          <button
-            onClick={() => isArmed && onConfirm()}
-            disabled={!isArmed}
-            className={`
-              relative flex-1 py-4 rounded-xl font-utility text-sm font-medium overflow-hidden transition-all duration-300
-              ${isArmed 
-                ? 'bg-error/20 border border-error/50 text-error hover:bg-error hover:text-white hover:shadow-[0_0_25px_rgba(155,68,68,0.5)] active:scale-95 cursor-pointer' 
-                : 'bg-surface-low border border-transparent text-on-surface-variant/50 cursor-not-allowed'
-              }
-            `}
+          {/* Botón Primario (Destructivo, sin animaciones basura) */}
+          <Button
+            variant="destructive"
+            className="flex-1 py-4"
+            onClick={onConfirm}
           >
-            {/* Barra de progreso de llenado (Solo visible mientras se arma) */}
-            {!isArmed && (
-              <div 
-                className="absolute left-0 top-0 bottom-0 bg-error/10 transition-all duration-75 ease-linear"
-                style={{ width: `${progress}%` }}
-              />
-            )}
-            
-            {/* Texto del botón (Asegurado sobre la barra de progreso) */}
-            <span className="relative z-10">
-              {confirmText}
-            </span>
-          </button>
+            {confirmText}
+          </Button>
 
         </div>
       </div>
