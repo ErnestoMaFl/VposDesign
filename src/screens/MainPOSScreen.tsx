@@ -14,7 +14,6 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { saleToCartView } from '@/utils/saleAdapters';
 import type { CartStatus } from '@/types/cart';
-import type { Sale } from '@/services/saleService';
 
 // En el navegador, setTimeout devuelve number, no NodeJS.Timeout
 type TimeoutHandle = ReturnType<typeof setTimeout>;
@@ -342,7 +341,7 @@ export const MainPOSScreen = () => {
 
       {/* Buscador + Cancelar (solo en pasos de armado) */}
       {cartStatus !== 'frozen' && currentStep < 2 && (
-        <div className="px-4 pb-4 pt-2 flex gap-4 items-center z-50 relative animate-in fade-in duration-300">
+        <div className="px-4 pb-4 pt-2 flex gap-4 items-center z-20 relative animate-in fade-in duration-300">
           <div className="flex-1 min-w-0">
             <HybridSearchInput
               value={searchQuery}

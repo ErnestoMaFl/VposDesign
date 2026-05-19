@@ -47,7 +47,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           />
         </div>
 
-        <div className="flex-1 relative flex flex-col overflow-hidden">
+        <div className="flex-1 relative z-0 flex flex-col overflow-hidden">
           {children}
         </div>
       </div>
