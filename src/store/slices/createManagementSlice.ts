@@ -3,15 +3,27 @@ import type { StoreState } from '../useAppStore';
 
 export interface Product {
   id: string;
-  sku: string;
   name: string;
+  sku: string;
+  barcode?: string;
+  brand?: string;
   category: string;
+  unit: string; // unit_of_measure
+  is_active: boolean;
+  is_bulk: boolean;
+  
   priceCost: number;
   priceSale: number;
+  taxRate?: number;
+  
   stock: number;
   minStock: number;
-  unit: string;
-  aiAliases: string[];
+  maxStock?: number;
+  
+  aiAliases?: string[];
+  synonyms?: string[];
+  naturalDescription?: string;
+  technicalDescription?: string;
 }
 
 export type ManagementViewMode = 'list' | 'edit' | 'create';
@@ -38,10 +50,10 @@ export interface ManagementSlice {
 }
 
 const mockCatalog: Product[] = [
-  { id: 'p1', sku: 'CC-600', name: 'Coca Cola Original 600ml', category: 'Bebidas', priceCost: 11.50, priceSale: 18.50, stock: 24, minStock: 10, unit: 'Pieza', aiAliases: ['coca', 'coquita'] },
-  { id: 'p2', sku: 'SAB-45', name: 'Sabritas Sal 45g', category: 'Botanas', priceCost: 14.00, priceSale: 20.00, stock: 12, minStock: 5, unit: 'Pieza', aiAliases: ['papas'] },
-  { id: 'p3', sku: 'AZ-1KG', name: 'Azúcar Zulka 1kg', category: 'Abarrotes', priceCost: 22.00, priceSale: 28.00, stock: 5, minStock: 10, unit: 'Kg', aiAliases: ['azucar blanca'] },
-  { id: 'p4', sku: 'ACE-1L', name: 'Aceite La Gloria 1L', category: 'Abarrotes', priceCost: 38.00, priceSale: 45.00, stock: 8, minStock: 5, unit: 'Litro', aiAliases: ['aceite'] },
+  { id: 'p1', sku: 'CC-600', name: 'Coca Cola Original 600ml', category: 'Bebidas', priceCost: 11.50, priceSale: 18.50, stock: 24, minStock: 10, unit: 'pieza', is_active: true, is_bulk: false, aiAliases: ['coca', 'coquita'] },
+  { id: 'p2', sku: 'SAB-45', name: 'Sabritas Sal 45g', category: 'Botanas', priceCost: 14.00, priceSale: 20.00, stock: 12, minStock: 5, unit: 'pieza', is_active: true, is_bulk: false, aiAliases: ['papas'] },
+  { id: 'p3', sku: 'AZ-1KG', name: 'Azúcar Zulka 1kg', category: 'Abarrotes', priceCost: 22.00, priceSale: 28.00, stock: 5, minStock: 10, unit: 'kilogramo', is_active: true, is_bulk: true, aiAliases: ['azucar blanca'] },
+  { id: 'p4', sku: 'ACE-1L', name: 'Aceite La Gloria 1L', category: 'Abarrotes', priceCost: 38.00, priceSale: 45.00, stock: 8, minStock: 5, unit: 'litro', is_active: true, is_bulk: false, aiAliases: ['aceite'] },
 ];
 
 export const createManagementSlice: StateCreator<StoreState, [], [], ManagementSlice> = (set, get) => ({
@@ -57,7 +69,18 @@ export const createManagementSlice: StateCreator<StoreState, [], [], ManagementS
   openCreateProduct: () => set((state) => {
     const newId = `temp-${Date.now()}`;
     const emptyProduct: Product = {
-      id: newId, sku: '', name: '', category: '', priceCost: 0, priceSale: 0, stock: 0, minStock: 0, unit: 'Pieza', aiAliases: []
+      id: newId, 
+      sku: '', 
+      name: '', 
+      category: '', 
+      priceCost: 0, 
+      priceSale: 0, 
+      stock: 0, 
+      minStock: 0, 
+      unit: 'pieza', 
+      is_active: true, 
+      is_bulk: false, 
+      aiAliases: []
     };
     return { 
       catalog: [emptyProduct, ...state.catalog], // Lo metemos al catálogo
