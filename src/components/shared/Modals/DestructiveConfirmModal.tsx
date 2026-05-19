@@ -8,6 +8,7 @@ interface DestructiveConfirmModalProps {
   description: string;
   confirmText?: string;
   cancelText?: string;
+  armingTimeMs?: number;
   onConfirm: () => void;
   onCancel: () => void;
 }

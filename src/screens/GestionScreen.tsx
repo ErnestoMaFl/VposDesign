@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'; // <-- AÑADIR useState
+import { useMemo, useState, useEffect } from 'react'; // <-- Añadido useEffect
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store/useAppStore';
 import { CardPanelLayout } from '@/components/layout/CardPanelLayout';
@@ -10,37 +10,62 @@ import { DestructiveConfirmModal } from '@/components/shared/Modals/DestructiveC
 
 export const GestionScreen = () => {
   const { 
-    catalog, searchQuery, viewMode, activeProductId, isSearching, orbState, connectionState,
-    setSearchQuery, openEditProduct, closeForm, saveProduct, openCreateProduct
+    catalog, searchQuery, viewMode, activeProductId, orbState, connectionState,
+    setSearchQuery, openEditProduct, closeForm, saveProduct, openCreateProduct,
+    lastSearchResult, searchUIState, performSearch, clearSearch
   } = useAppStore(useShallow((state) => ({
     catalog: state.catalog,
     searchQuery: state.searchQuery,
     viewMode: state.viewMode,
     activeProductId: state.activeProductId,
-    isSearching: state.isSearching,
     orbState: state.orbState,
     connectionState: state.connectionState,
     setSearchQuery: state.setSearchQuery,
     openEditProduct: state.openEditProduct,
     closeForm: state.closeForm,
     saveProduct: state.saveProduct,
-    openCreateProduct: state.openCreateProduct
+    openCreateProduct: state.openCreateProduct,
+    lastSearchResult: state.lastSearchResult,
+    searchUIState: state.searchUIState,
+    performSearch: state.performSearch,
+    clearSearch: state.clearSearch,
   })));
 
   // ESTADO PARA EL MODAL DE DESCARTAR CAMBIOS
   const [isDiscardModalOpen, setIsDiscardModalOpen] = useState(false);
 
+  // Dispara la búsqueda real en el backend al cambiar el input
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      clearSearch();
+      return;
+    }
+    performSearch(searchQuery).catch(() => {
+      // El slice ya capturó el error; aquí solo evitamos unhandled rejection
+    });
+  }, [searchQuery, performSearch, clearSearch]);
+
+  // Reemplazo del filtro local por mapeo de candidatos del backend
   const filteredCatalog = useMemo(() => {
-    if (!searchQuery) return catalog.slice(0, 50);
-    
-    const q = searchQuery.toLowerCase();
-    const resultados = catalog.filter(p => 
-      p.name.toLowerCase().includes(q) || 
-      p.sku.toLowerCase().includes(q)
-    );
-    
-    return resultados.slice(0, 50);
-  }, [catalog, searchQuery]);
+    if (!searchQuery.trim()) {
+      // Sin búsqueda: mostramos el catálogo local (cacheado en el store)
+      return catalog.slice(0, 50);
+    }
+    // Con búsqueda: convertimos los candidatos del backend a tu tipo Product
+    if (!lastSearchResult) return [];
+    return lastSearchResult.candidates.map((c) => ({
+      id: c.id,
+      sku: c.sku ?? '',
+      name: c.name,
+      category: c.category_name ?? '',
+      priceCost: c.price_cost,
+      priceSale: c.price_sale,
+      stock: c.stock_quantity,
+      minStock: 0,
+      unit: c.unit_of_measure,
+      aiAliases: c.voice_aliases,
+    }));
+  }, [catalog, searchQuery, lastSearchResult]);
 
   const activeProduct = useMemo(() => 
     catalog.find(p => p.id === activeProductId), 
@@ -65,7 +90,7 @@ export const GestionScreen = () => {
     
     return {
       status: orbState,
-      transcriptText: isSearching ? searchQuery : (orbState === 'listening' ? "busca sabritas..." : ""),
+      transcriptText: searchUIState === 'loading' ? searchQuery : (orbState === 'listening' ? "busca sabritas..." : ""),
       isPartialTranscript: orbState === 'listening',
       interpretations: [],
       availableCommands: ['Buscar [producto]', 'Nuevo producto', 'Volver al inicio']
@@ -97,7 +122,6 @@ export const GestionScreen = () => {
         ) : (
           <div className="flex gap-3">
             <button 
-              // CAMBIO AQUÍ: En lugar de closeForm(), abrimos el modal
               onClick={() => setIsDiscardModalOpen(true)} 
               className="flex items-center gap-2 px-5 py-2.5 bg-surface-low hover:bg-error/15 hover:text-error border border-transparent transition-colors rounded-lg font-utility text-sm text-on-surface-variant"
             >
@@ -121,11 +145,14 @@ export const GestionScreen = () => {
               value={searchQuery} 
               onChange={setSearchQuery} 
               isListening={orbState === 'listening'} 
+              withDropdown={false}
+              autoSelectOnWinner={false}
+              placeholder="Buscar en tu catálogo (acepta sinónimos y errores)..."
             />
           </div>
           
           <div className="flex-1 overflow-y-auto pr-2 pb-8 [&::-webkit-scrollbar]:hidden">
-            {isSearching ? (
+            {searchUIState === 'loading' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                  {[1,2,3,4,5,6].map(i => (
                    <div key={i} className="h-[90px] bg-surface-low rounded-xl animate-pulse border border-surface-bright-edge/10 flex items-center p-4 gap-4">
@@ -162,17 +189,17 @@ export const GestionScreen = () => {
         </div>
       )}
 
-      {/* NUESTRO MODAL INYECTADO */}
+      {/* MODAL DE CONFIRMACIÓN */}
       <DestructiveConfirmModal
         isOpen={isDiscardModalOpen}
         title="¿Descartar cambios?"
         description="Se perderán todas las modificaciones no guardadas de este producto. Esta acción no se puede deshacer."
         confirmText="Sí, descartar"
         cancelText="Seguir editando"
-        armingTimeMs={1000} // Le ponemos 1 segundo para no ser tan lentos en catálogos
+        armingTimeMs={1000}
         onConfirm={() => {
           setIsDiscardModalOpen(false);
-          closeForm(); // Aquí ejecutamos la acción real
+          closeForm();
         }}
         onCancel={() => setIsDiscardModalOpen(false)}
       />

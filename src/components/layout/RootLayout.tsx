@@ -1,11 +1,23 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { SystemSidebar } from '@/components/layout/SystemSidebar';
+import { wsVoiceClient } from '@/services/wsClient';
+import { useEffect } from 'react';
 
 export const RootLayout = () => {
   const location = useLocation(); // Leemos la URL actual
 
   // Si la ruta es '/venta', mostramos la variante POS del Sidebar. Si no, la del Home.
   const isPOS = location.pathname === '/venta';
+  
+  useEffect(() => {
+    // 1. Iniciar conexión WS al montar la app
+    wsVoiceClient.connect();
+
+    // 2. Limpieza estricta al desmontar (evita memory leaks)
+    return () => {
+      wsVoiceClient.disconnect();
+    };
+  }, []);
 
   return (
     <div className="flex w-full h-screen bg-surface-base overflow-hidden">
