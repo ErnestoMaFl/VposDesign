@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useAppStore';
-import type { ChatMessage, ChartPayload } from '@/types/analytics';
+import type { ChatMessage } from '@/types/analytics';
+import { analyticsService } from '@/services/analyticsService';
 
 export interface AnalyticsSlice {
   chatHistory: ChatMessage[];
@@ -97,48 +98,93 @@ export const createAnalyticsSlice: StateCreator<
   setIsSpeaking: (status) => set({ isSpeaking: status }),
 
   // [Flujo Completo / Oficina]
-  simulateQueryResponse: (question: string) => {
-    get().addMessage({ id: `user-${Date.now()}`, role: 'user', content: question, timestamp: Date.now() });
+  simulateQueryResponse: async (question: string) => {
+    get().addMessage({
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: question,
+      timestamp: Date.now(),
+    });
     set({ isQuerying: true });
     get().setOrbState('processing');
 
-    setTimeout(() => {
+    try {
+      const result = await analyticsService.query(question, false);
       get().setOrbState('success');
-      
-      // Tiramos los dados y obtenemos una respuesta aleatoria
-      const responseMessage = generateRandomMockResponse('sys');
-      
+
+      const responseMessage: ChatMessage = {
+        id: `sys-${Date.now()}`,
+        role: 'system',
+        content: result.narrative,
+        timestamp: Date.now(),
+        variant: result.variant,
+        payload: result.payload as any,
+      };
+
       get().addMessage(responseMessage);
       set({ isQuerying: false, isSpeaking: true });
-      
+
       setTimeout(() => get().setOrbState('standby'), 1000);
       setTimeout(() => set({ isSpeaking: false }), 3000);
-    }, 1500);
+    } catch (e) {
+      console.error('[Analytics] query failed:', e);
+      get().setOrbState('error');
+      get().addMessage({
+        id: `sys-err-${Date.now()}`,
+        role: 'system',
+        content:
+          'No pude conectar con el motor de análisis. Verifica tu conexión e inténtalo de nuevo.',
+        timestamp: Date.now(),
+        variant: 'text',
+      });
+      set({ isQuerying: false });
+      setTimeout(() => get().setOrbState('standby'), 1500);
+    }
   },
 
   // [Flujo Efímero / Mostrador]
-  simulateQuickQuery: (question: string) => {
+  simulateQuickQuery: async (question: string) => {
     set({ isQuickQueryModalOpen: true, activeQuickQuery: null, isQuerying: true });
     get().setOrbState('processing');
 
-    setTimeout(() => {
+    try {
+      const result = await analyticsService.query(question, true); // quick=true
       get().setOrbState('success');
-      
-      // Tiramos los dados y obtenemos una respuesta aleatoria
-      const responseMessage = generateRandomMockResponse('quick');
-      
-      set({ 
-        activeQuickQuery: responseMessage, 
-        isQuerying: false 
-      });
 
+      const responseMessage: ChatMessage = {
+        id: `quick-${Date.now()}`,
+        role: 'system',
+        content: result.narrative,
+        timestamp: Date.now(),
+        variant: result.variant,
+        payload: result.payload as any,
+      };
+
+      set({
+        activeQuickQuery: responseMessage,
+        isQuerying: false,
+      });
       setTimeout(() => get().setOrbState('standby'), 1500);
-    }, 1500);
+    } catch (e) {
+      console.error('[Analytics] quick query failed:', e);
+      get().setOrbState('error');
+      set({
+        activeQuickQuery: {
+          id: `quick-err-${Date.now()}`,
+          role: 'system',
+          content: 'No pude obtener la información solicitada.',
+          timestamp: Date.now(),
+          variant: 'text',
+        },
+        isQuerying: false,
+      });
+      setTimeout(() => get().setOrbState('standby'), 1500);
+    }
   },
 
   closeQuickQuery: () => {
     set({ isQuickQueryModalOpen: false });
     setTimeout(() => set({ activeQuickQuery: null }), 300);
     get().setOrbState('standby');
-  }
+  },
 });
